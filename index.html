@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicken Recipe Shoppoing List Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        
+       
+        body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #FFF9F0;
+    }
+    
+    .recipe-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .recipe-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .shopping-list-item {
+        animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(234, 88, 12, 0.2);
+    }
+    
+    .tab-active {
+        border-bottom: 3px solid #ea580c;
+        color: #ea580c;
+        font-weight: 600;
+    }
+    
+    .portion-btn.active {
+        background-color: #ea580c;
+        color: white;
+    }
+    
+    /* Custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #ea580c;
+        border-radius: 10px;
+    }
+</style>
+</head>
+<body>
+     <div class="container mx-auto px-4 py-8 max-w-7x1">
+<header class="text-center mb-10">
+<h1 class="text-4xl font-bold text-orange-600 mb-2">Chicken Recipe Shopping List Builder</h1>
+<p class="text-gray-600 max-w-2xl mx-auto">Select your favorite chicken recipes, adjust portion sizes, and generate a complete shopping list for your weekly meal prep.</p>
+</header>
+    <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Left side: Recipe selection -->
+        <div class="lg:w-2/3 bg-white rounded-xl shadow-lg p-6">
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="all-tab" class="tab-active px-4 py-2 focus:outline-none">All Recipes</button>
+                <button id="selected-tab" class="px-4 py-2 focus:outline-none">Selected Recipes</button>
+            </div>
+            
+            <div class="mb-4">
+                <input type="text" id="recipe-search" placeholder="Search recipes..." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+            
+            <div id="recipes-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto custom-scrollbar">
+                <!-- Recipe cards will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Right side: Shopping list -->
+        <div class="lg:w-1/3 bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Shopping List</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-700 mb-2">Selected Recipes</h3>
+                <div id="selected-recipes" class="mb-4 text-gray-500 italic">
+                    No recipes selected yet
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-sm font-medium text-gray-700">Default Portion Size:</span>
+                    <button class="portion-btn active px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-600" data-portion="2">2 servings</button>
+                    <button class="portion-btn px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-600" data-portion="4">4 servings</button>
+                    <button class="portion-btn px-3 py-1 text-sm rounded-full bg-orange-100 text-orange-600" data-portion="6">6 servings</button>
+                </div>
+                
+                <button id="generate-list" class="btn-primary w-full bg-orange-600 text-white py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Generate Shopping List
+                </button>
+            </div>
+            
+            <div id="shopping-list-container" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-700">Ingredients</h3>
+                    <button id="print-list" class="text-sm text-orange-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print List
+                    </button>
+                </div>
+                
+                <div id="shopping-list" class="max-h-[400px] overflow-y-auto custom-scrollbar">
+                    <!-- Shopping list will be populated here -->
+                </div>
+                
+                <button id="clear-list" class="mt-4 w-full border border-orange-600 text-orange-600 py-2 rounded-lg font-medium hover:bg-orange-50">
+                    Clear List
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recipe Detail Modal -->
+    <div id="recipe-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="modal-title" class="text-2xl font-bold text-gray-800"></h2>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-1/2">
+                        <div id="modal-image" class="w-full h-64 bg-orange-100 rounded-lg mb-4 flex items-center justify-center"></div>
+                        
+                        <div class="mb-4">
+                            <h3 class="font-medium text-gray-800 mb-2">Adjust Portion Size</h3>
+                            <div class="flex items-center">
+                                <button id="decrease-portion" class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center">-</button>
+                                <span id="modal-portion" class="mx-4 font-medium">2</span>
+                                <button id="increase-portion" class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center">+</button>
+                                <span class="ml-2 text-gray-600">servings</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium text-gray-800 mb-2">Ingredients</h3>
+                            <ul id="modal-ingredients" class="list-disc pl-5 text-gray-600"></ul>
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-1/2">
+                        <h3 class="font-medium text-gray-800 mb-2">Instructions</h3>
+                        <ol id="modal-instructions" class="list-decimal pl-5 text-gray-600 space-y-2"></ol>
+                        
+                        <div class="mt-6">
+                            <h3 class="font-medium text-gray-800 mb-2">Nutrition (per serving)</h3>
+                            <div id="modal-nutrition" class="grid grid-cols-2 gap-2 text-sm text-gray-600"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end">
+                    <button id="modal-add-recipe" class="btn-primary bg-orange-600 text-white px-6 py-2 rounded-lg font-medium">
+                        Add to Shopping List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Recipe data
+    const recipes = [
+        {
+            id: 1,
+            name: "Lemon Herb Roasted Chicken",
+            description: "A classic roasted chicken with bright lemon and herb flavors, perfect for a Sunday dinner.",
+            image: "🍗",
+            ingredients: [
+                { name: "whole chicken", amount: 1, unit: "", category: "Meat" },
+                { name: "lemons", amount: 2, unit: "", category: "Produce" },
+                { name: "garlic cloves", amount: 6, unit: "", category: "Produce" },
+                { name: "fresh rosemary", amount: 2, unit: "sprigs", category: "Produce" },
+                { name: "fresh thyme", amount: 4, unit: "sprigs", category: "Produce" },
+                { name: "olive oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" }
+            ],
+            instructions: [
+                "Preheat oven to 425°F (220°C).",
+                "Remove giblets from chicken cavity and pat dry with paper towels.",
+                "Quarter one lemon and place inside the cavity along with garlic cloves and herbs.",
+                "Rub olive oil all over the chicken and season with salt and pepper.",
+                "Slice the second lemon and arrange around the chicken in a roasting pan.",
+                "Roast for 1 hour and 15 minutes or until juices run clear.",
+                "Let rest for 10 minutes before carving."
+            ],
+            nutrition: {
+                calories: 350,
+                protein: 42,
+                carbs: 3,
+                fat: 18
+            },
+            prepTime: 15,
+            cookTime: 75,
+            servings: 4
+        },
+        {
+            id: 2,
+            name: "Chicken Tikka Masala",
+            description: "Tender chunks of chicken in a creamy, spiced tomato sauce. A crowd-pleasing Indian favorite.",
+            image: "🍛",
+            ingredients: [
+                { name: "boneless chicken thighs", amount: 1.5, unit: "lbs", category: "Meat" },
+                { name: "plain yogurt", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "lemon juice", amount: 2, unit: "tbsp", category: "Produce" },
+                { name: "garam masala", amount: 2, unit: "tsp", category: "Spices" },
+                { name: "ground cumin", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "ground coriander", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "turmeric", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "onion", amount: 1, unit: "large", category: "Produce" },
+                { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "crushed tomatoes", amount: 14, unit: "oz", category: "Canned Goods" },
+                { name: "heavy cream", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "butter", amount: 2, unit: "tbsp", category: "Dairy" },
+                { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "In a bowl, mix yogurt, lemon juice, and half the spices. Add chicken and marinate for at least 1 hour.",
+                "Grill or broil chicken until charred and cooked through. Set aside.",
+                "In a large pan, melt butter and sauté onions until soft. Add garlic and ginger, cook for 1 minute.",
+                "Add remaining spices and cook until fragrant, about 30 seconds.",
+                "Add crushed tomatoes and simmer for 15 minutes.",
+                "Stir in cream and simmer for 5 minutes. Add chicken and heat through.",
+                "Garnish with cilantro and serve with rice or naan."
+            ],
+            nutrition: {
+                calories: 420,
+                protein: 35,
+                carbs: 12,
+                fat: 26
+            },
+            prepTime: 20,
+            cookTime: 40,
+            servings: 4
+        },
+        {
+            id: 3,
+            name: "Chicken Fajitas",
+            description: "Sizzling hot strips of chicken with colorful bell peppers and onions, perfect for a quick weeknight meal.",
+            image: "🌮",
+            ingredients: [
+                { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
+                { name: "bell peppers", amount: 3, unit: "", category: "Produce" },
+                { name: "onion", amount: 1, unit: "large", category: "Produce" },
+                { name: "lime", amount: 1, unit: "", category: "Produce" },
+                { name: "chili powder", amount: 2, unit: "tsp", category: "Spices" },
+                { name: "cumin", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "garlic powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "olive oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "flour tortillas", amount: 8, unit: "", category: "Bread & Bakery" },
+                { name: "sour cream", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "avocado", amount: 1, unit: "", category: "Produce" }
+            ],
+            instructions: [
+                "Slice chicken, bell peppers, and onions into thin strips.",
+                "In a bowl, mix chili powder, cumin, garlic powder, and 2 tbsp olive oil.",
+                "Add chicken to the spice mixture and marinate for 15 minutes.",
+                "Heat remaining oil in a large skillet over high heat. Add chicken and cook until no longer pink.",
+                "Add peppers and onions, cooking until tender-crisp.",
+                "Squeeze lime juice over the mixture and stir.",
+                "Warm tortillas and serve with sour cream and sliced avocado."
+            ],
+            nutrition: {
+                calories: 380,
+                protein: 28,
+                carbs: 30,
+                fat: 16
+            },
+            prepTime: 15,
+            cookTime: 15,
+            servings: 4
+        },
+        {
+            id: 4,
+            name: "Chicken Parmesan",
+            description: "Crispy breaded chicken topped with marinara sauce and melted cheese, served over pasta.",
+            image: "🍝",
+            ingredients: [
+                { name: "chicken breasts", amount: 2, unit: "large", category: "Meat" },
+                { name: "eggs", amount: 2, unit: "", category: "Dairy" },
+                { name: "breadcrumbs", amount: 1, unit: "cup", category: "Dry Goods" },
+                { name: "parmesan cheese", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "mozzarella cheese", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "marinara sauce", amount: 2, unit: "cups", category: "Canned Goods" },
+                { name: "spaghetti", amount: 8, unit: "oz", category: "Dry Goods" },
+                { name: "fresh basil", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "olive oil", amount: 0.25, unit: "cup", category: "Oils & Vinegars" },
+                { name: "garlic powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" }
+            ],
+            instructions: [
+                "Preheat oven to 425°F (220°C).",
+                "Butterfly chicken breasts and pound to even thickness.",
+                "Beat eggs in a shallow dish. In another dish, mix breadcrumbs, half the parmesan, garlic powder, salt, and pepper.",
+                "Dip chicken in eggs, then coat with breadcrumb mixture.",
+                "Heat olive oil in a large skillet and cook chicken until golden, about 4 minutes per side.",
+                "Place chicken in a baking dish, top with marinara sauce and cheeses.",
+                "Bake for 15-20 minutes until cheese is bubbly and chicken is cooked through.",
+                "Meanwhile, cook spaghetti according to package directions.",
+                "Serve chicken over spaghetti and garnish with fresh basil."
+            ],
+            nutrition: {
+                calories: 520,
+                protein: 40,
+                carbs: 42,
+                fat: 22
+            },
+            prepTime: 20,
+            cookTime: 35,
+            servings: 4
+        },
+        {
+            id: 5,
+            name: "Honey Garlic Chicken",
+            description: "Sweet and sticky chicken with a delicious honey garlic sauce, ready in just 20 minutes.",
+            image: "🍯",
+            ingredients: [
+                { name: "chicken thighs", amount: 1.5, unit: "lbs", category: "Meat" },
+                { name: "honey", amount: 0.33, unit: "cup", category: "Condiments" },
+                { name: "soy sauce", amount: 0.25, unit: "cup", category: "Condiments" },
+                { name: "garlic cloves", amount: 5, unit: "", category: "Produce" },
+                { name: "rice vinegar", amount: 1, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "cornstarch", amount: 1, unit: "tbsp", category: "Dry Goods" },
+                { name: "water", amount: 2, unit: "tbsp", category: "Beverages" },
+                { name: "green onions", amount: 3, unit: "", category: "Produce" },
+                { name: "sesame seeds", amount: 1, unit: "tbsp", category: "Spices" },
+                { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" }
+            ],
+            instructions: [
+                "Cut chicken into bite-sized pieces.",
+                "In a bowl, mix honey, soy sauce, minced garlic, and rice vinegar.",
+                "Heat oil in a large skillet over medium-high heat.",
+                "Add chicken and cook until browned and nearly cooked through, about 5 minutes.",
+                "Pour sauce over chicken and bring to a simmer.",
+                "Mix cornstarch and water, then add to the skillet.",
+                "Cook until sauce thickens, about 2 minutes.",
+                "Garnish with sliced green onions and sesame seeds.",
+                "Serve over rice or with steamed vegetables."
+            ],
+            nutrition: {
+                calories: 320,
+                protein: 28,
+                carbs: 18,
+                fat: 16
+            },
+            prepTime: 10,
+            cookTime: 10,
+            servings: 4
+        },
+        {
+            id: 6,
+            name: "Chicken Alfredo Pasta",
+            description: "Creamy pasta with tender chicken and a rich parmesan sauce. Pure comfort food.",
+            image: "🍲",
+            ingredients: [
+                { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
+                { name: "fettuccine pasta", amount: 12, unit: "oz", category: "Dry Goods" },
+                { name: "heavy cream", amount: 1.5, unit: "cups", category: "Dairy" },
+                { name: "butter", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "parmesan cheese", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                { name: "Italian seasoning", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "fresh parsley", amount: 2, unit: "tbsp", category: "Produce" }
+            ],
+            instructions: [
+                "Cook pasta according to package directions. Reserve 1/2 cup pasta water before draining.",
+                "Season chicken with salt, pepper, and Italian seasoning.",
+                "Heat 2 tbsp butter in a large skillet and cook chicken until golden and cooked through, about 6 minutes per side.",
+                "Remove chicken and slice into strips.",
+                "In the same skillet, add remaining butter and minced garlic. Cook for 1 minute.",
+                "Add heavy cream and bring to a simmer. Cook for 5 minutes until slightly thickened.",
+                "Whisk in parmesan cheese until melted and smooth.",
+                "Add pasta and chicken to the sauce, tossing to coat. Add pasta water if needed to thin the sauce.",
+                "Garnish with chopped parsley and additional parmesan."
+            ],
+            nutrition: {
+                calories: 650,
+                protein: 35,
+                carbs: 40,
+                fat: 38
+            },
+            prepTime: 10,
+            cookTime: 20,
+            servings: 4
+        },
+        {
+            id: 7,
+            name: "Buffalo Chicken Wings",
+            description: "Crispy chicken wings tossed in spicy buffalo sauce. Perfect for game day or any gathering.",
+            image: "🍗",
+            ingredients: [
+                { name: "chicken wings", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "hot sauce", amount: 0.5, unit: "cup", category: "Condiments" },
+                { name: "butter", amount: 0.25, unit: "cup", category: "Dairy" },
+                { name: "garlic powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "baking powder", amount: 1, unit: "tbsp", category: "Dry Goods" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "celery sticks", amount: 4, unit: "", category: "Produce" },
+                { name: "blue cheese dressing", amount: 0.5, unit: "cup", category: "Condiments" }
+            ],
+            instructions: [
+                "Preheat oven to 425°F (220°C). Line a baking sheet with foil and place a wire rack on top.",
+                "Pat wings dry with paper towels. In a large bowl, toss wings with baking powder and salt.",
+                "Arrange wings on the rack and bake for 45-50 minutes, turning halfway, until crispy and golden.",
+                "In a small saucepan, melt butter and whisk in hot sauce and garlic powder.",
+                "In a large bowl, toss hot wings with the sauce until well coated.",
+                "Serve immediately with celery sticks and blue cheese dressing."
+            ],
+            nutrition: {
+                calories: 380,
+                protein: 24,
+                carbs: 2,
+                fat: 30
+            },
+            prepTime: 10,
+            cookTime: 50,
+            servings: 4
+        },
+        {
+            id: 8,
+            name: "Chicken Caesar Salad",
+            description: "A classic salad with grilled chicken, crisp romaine, parmesan, and creamy Caesar dressing.",
+            image: "🥗",
+            ingredients: [
+                { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
+                { name: "romaine lettuce", amount: 2, unit: "heads", category: "Produce" },
+                { name: "parmesan cheese", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "croutons", amount: 1, unit: "cup", category: "Dry Goods" },
+                { name: "Caesar dressing", amount: 0.5, unit: "cup", category: "Condiments" },
+                { name: "lemon", amount: 1, unit: "", category: "Produce" },
+                { name: "garlic cloves", amount: 2, unit: "", category: "Produce" },
+                { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "Italian seasoning", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" }
+            ],
+            instructions: [
+                "Season chicken with Italian seasoning, salt, and pepper.",
+                "Heat olive oil in a skillet over medium-high heat and cook chicken until golden and cooked through, about 6 minutes per side.",
+                "Let chicken rest for 5 minutes, then slice into strips.",
+                "Wash and chop romaine lettuce into bite-sized pieces.",
+                "In a large bowl, toss lettuce with Caesar dressing.",
+                "Add chicken, shaved parmesan, and croutons.",
+                "Squeeze fresh lemon juice over the salad and toss gently.",
+                "Serve immediately with additional parmesan if desired."
+            ],
+            nutrition: {
+                calories: 380,
+                protein: 30,
+                carbs: 10,
+                fat: 24
+            },
+            prepTime: 15,
+            cookTime: 15,
+            servings: 4
+        },
+        {
+            id: 9,
+            name: "Chicken Stir Fry",
+            description: "Quick and colorful stir-fried chicken with crisp vegetables in a savory sauce.",
+            image: "🥢",
+            ingredients: [
+                { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
+                { name: "broccoli", amount: 2, unit: "cups", category: "Produce" },
+                { name: "bell peppers", amount: 2, unit: "", category: "Produce" },
+                { name: "carrots", amount: 2, unit: "", category: "Produce" },
+                { name: "snow peas", amount: 1, unit: "cup", category: "Produce" },
+                { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "soy sauce", amount: 0.25, unit: "cup", category: "Condiments" },
+                { name: "sesame oil", amount: 1, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "cornstarch", amount: 1, unit: "tbsp", category: "Dry Goods" },
+                { name: "chicken broth", amount: 0.5, unit: "cup", category: "Canned Goods" },
+                { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "sesame seeds", amount: 1, unit: "tbsp", category: "Spices" }
+            ],
+            instructions: [
+                "Cut chicken into bite-sized pieces. Slice vegetables into similar-sized pieces.",
+                "In a small bowl, whisk together soy sauce, chicken broth, cornstarch, and sesame oil.",
+                "Heat vegetable oil in a wok or large skillet over high heat.",
+                "Add chicken and stir-fry until nearly cooked through, about 4 minutes.",
+                "Add garlic and ginger, cook for 30 seconds until fragrant.",
+                "Add vegetables and stir-fry for 3-4 minutes until crisp-tender.",
+                "Pour sauce over the mixture and cook, stirring, until thickened, about 2 minutes.",
+                "Sprinkle with sesame seeds and serve over rice."
+            ],
+            nutrition: {
+                calories: 290,
+                protein: 28,
+                carbs: 15,
+                fat: 14
+            },
+            prepTime: 15,
+            cookTime: 10,
+            servings: 4
+        },
+        {
+            id: 10,
+            name: "Chicken Enchiladas",
+            description: "Tortillas filled with seasoned chicken and cheese, topped with enchilada sauce and baked until bubbly.",
+            image: "🌯",
+            ingredients: [
+                { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
+                { name: "enchilada sauce", amount: 2, unit: "cups", category: "Canned Goods" },
+                { name: "flour tortillas", amount: 8, unit: "large", category: "Bread & Bakery" },
+                { name: "cheddar cheese", amount: 2, unit: "cups", category: "Dairy" },
+                { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+                { name: "green chilies", amount: 4, unit: "oz", category: "Canned Goods" },
+                { name: "taco seasoning", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "sour cream", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "vegetable oil", amount: 1, unit: "tbsp", category: "Oils & Vinegars" }
+            ],
+            instructions: [
+                "Preheat oven to 350°F (175°C).",
+                "Season chicken with taco seasoning and cook in oil until no longer pink, about 6-7 minutes per side.",
+                "Shred chicken and mix with diced onion, half the cheese, and green chilies.",
+                "Spread 1/2 cup enchilada sauce in the bottom of a 9x13 baking dish.",
+                "Fill each tortilla with chicken mixture, roll up, and place seam-side down in the dish.",
+                "Pour remaining enchilada sauce over tortillas and sprinkle with remaining cheese.",
+                "Bake for 20-25 minutes until cheese is melted and sauce is bubbly.",
+                "Serve topped with sour cream and chopped cilantro."
+            ],
+            nutrition: {
+                calories: 420,
+                protein: 32,
+                carbs: 30,
+                fat: 20
+            },
+            prepTime: 20,
+            cookTime: 35,
+            servings: 4
+        },
+        {
+            id: 11,
+            name: "Chicken Noodle Soup",
+            description: "Comforting homemade soup with tender chicken, vegetables, and egg noodles.",
+            image: "🍜",
+            ingredients: [
+                { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
+                { name: "egg noodles", amount: 8, unit: "oz", category: "Dry Goods" },
+                { name: "carrots", amount: 3, unit: "", category: "Produce" },
+                { name: "celery stalks", amount: 3, unit: "", category: "Produce" },
+                { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+                { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                { name: "chicken broth", amount: 8, unit: "cups", category: "Canned Goods" },
+                { name: "bay leaves", amount: 2, unit: "", category: "Spices" },
+                { name: "dried thyme", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "fresh parsley", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" }
+            ],
+            instructions: [
+                "Heat olive oil in a large pot over medium heat.",
+                "Add diced onion, carrots, and celery. Cook until softened, about 5 minutes.",
+                "Add minced garlic and cook for 30 seconds until fragrant.",
+                "Add chicken broth, bay leaves, and thyme. Bring to a boil.",
+                "Add chicken breasts, reduce heat, and simmer for 15-20 minutes until chicken is cooked through.",
+                "Remove chicken and shred with two forks.",
+                "Return chicken to the pot and add egg noodles. Cook until noodles are tender, about 6-8 minutes.",
+                "Season with salt and pepper. Remove bay leaves.",
+                "Stir in chopped parsley before serving."
+            ],
+            nutrition: {
+                calories: 280,
+                protein: 26,
+                carbs: 25,
+                fat: 10
+            },
+            prepTime: 15,
+            cookTime: 40,
+            servings: 6
+        },
+        {
+            id: 12,
+            name: "Chicken Quesadillas",
+            description: "Crispy tortillas filled with seasoned chicken, melted cheese, and sautéed peppers and onions.",
+            image: "🧀",
+            ingredients: [
+                { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
+                { name: "flour tortillas", amount: 8, unit: "large", category: "Bread & Bakery" },
+                { name: "cheddar cheese", amount: 2, unit: "cups", category: "Dairy" },
+                { name: "bell peppers", amount: 2, unit: "", category: "Produce" },
+                { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+                { name: "taco seasoning", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "sour cream", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "salsa", amount: 0.5, unit: "cup", category: "Condiments" },
+                { name: "avocado", amount: 1, unit: "", category: "Produce" }
+            ],
+            instructions: [
+                "Season chicken with taco seasoning and cook in 1 tbsp oil until no longer pink, about 6-7 minutes per side. Shred or dice.",
+                "In the same pan, sauté sliced peppers and onions until softened, about 5 minutes.",
+                "Heat a large skillet over medium heat. Place a tortilla in the skillet.",
+                "Sprinkle cheese on half the tortilla, then add chicken and vegetables.",
+                "Fold tortilla over and cook until golden brown, about 2-3 minutes per side.",
+                "Repeat with remaining tortillas and fillings.",
+                "Cut into wedges and serve with sour cream, salsa, and sliced avocado."
+            ],
+            nutrition: {
+                calories: 380,
+                protein: 25,
+                carbs: 28,
+                fat: 18
+            },
+            prepTime: 15,
+            cookTime: 20,
+            servings: 4
+        }, {
+                id: 13,
+                name: "Teriyaki Chicken",
+                description: "Juicy chicken glazed with a sweet and savory homemade teriyaki sauce.",
+                image: "🍱",
+                ingredients: [
+                    { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                    { name: "soy sauce", amount: 0.5, unit: "cup", category: "Condiments" },
+                    { name: "brown sugar", amount: 0.25, unit: "cup", category: "Dry Goods" },
+                    { name: "honey", amount: 2, unit: "tbsp", category: "Condiments" },
+                    { name: "rice vinegar", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                    { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                    { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+                    { name: "cornstarch", amount: 1, unit: "tbsp", category: "Dry Goods" },
+                    { name: "water", amount: 0.25, unit: "cup", category: "Beverages" },
+                    { name: "sesame seeds", amount: 1, unit: "tbsp", category: "Spices" },
+                    { name: "green onions", amount: 3, unit: "", category: "Produce" }
+                ],
+                instructions: [
+                    "In a bowl, whisk together soy sauce, brown sugar, honey, rice vinegar, minced garlic, and grated ginger.",
+                    "Reserve 1/2 cup of the sauce for later.",
+                    "Place chicken in a ziplock bag and pour remaining sauce over it. Marinate for at least 30 minutes.",
+                    "Preheat grill or skillet to medium-high heat.",
+                    "Remove chicken from marinade and cook for 5-7 minutes per side until cooked through.",
+                    "In a small saucepan, combine reserved sauce with cornstarch mixed with water.",
+                    "Bring to a simmer and cook until thickened, about 2 minutes.",
+                    "Brush thickened sauce over cooked chicken.",
+                    "Garnish with sesame seeds and sliced green onions."
+                ],
+                nutrition: {
+                    calories: 310,
+                    protein: 28,
+                    carbs: 16,
+                    fat: 15
+                },
+                prepTime: 10,
+                cookTime: 15,
+                servings: 6
+            },
+            {
+                id: 14,
+                name: "Chicken Pot Pie",
+                description: "Comforting pie filled with chicken, vegetables, and creamy sauce, topped with flaky pastry.",
+                image: "🥧",
+                ingredients: [
+                    { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
+                    { name: "carrots", amount: 3, unit: "", category: "Produce" },
+                    { name: "celery stalks", amount: 3, unit: "", category: "Produce" },
+                    { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+                    { name: "frozen peas", amount: 1, unit: "cup", category: "Frozen" },
+                    { name: "butter", amount: 0.33, unit: "cup", category: "Dairy" },
+                    { name: "all-purpose flour", amount: 0.33, unit: "cup", category: "Dry Goods" },
+                    { name: "chicken broth", amount: 1.75, unit: "cups", category: "Canned Goods" },
+                    { name: "milk", amount: 0.67, unit: "cup", category: "Dairy" },
+                    { name: "pie crusts", amount: 2, unit: "", category: "Bread & Bakery" },
+                    { name: "dried thyme", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "egg", amount: 1, unit: "", category: "Dairy" }
+                ],
+                instructions: [
+                    "Preheat oven to 425°F (220°C).",
+                    "Cook chicken in boiling water until no longer pink, about 15 minutes. Cool and dice.",
+                    "In a large skillet, melt butter and sauté onions, carrots, and celery until tender, about 10 minutes.",
+                    "Stir in flour, salt, pepper, and thyme until well blended.",
+                    "Gradually stir in chicken broth and milk. Simmer until thickened, about 5 minutes.",
+                    "Add chicken and peas, remove from heat.",
+                    "Line a 9-inch pie dish with one pie crust. Pour filling into crust.",
+                    "Cover with second crust, seal edges, and cut slits in top for steam to escape.",
+                    "Beat egg with 1 tbsp water and brush over crust.",
+                    "Bake for 30-35 minutes until golden brown. Let rest for 10 minutes before serving."
+                ],
+                nutrition: {
+                    calories: 460,
+                    protein: 28,
+                    carbs: 35,
+                    fat: 24
+                },
+                prepTime: 30,
+                cookTime: 45,
+                servings: 6
+            },
+            {
+                id: 15,
+                name: "Chicken Shawarma",
+                description: "Middle Eastern spiced chicken wrapped in warm pita with fresh vegetables and tahini sauce.",
+                image: "🥙",
+                ingredients: [
+                    { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                    { name: "olive oil", amount: 0.25, unit: "cup", category: "Oils & Vinegars" },
+                    { name: "lemon juice", amount: 3, unit: "tbsp", category: "Produce" },
+                    { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                    { name: "ground cumin", amount: 2, unit: "tsp", category: "Spices" },
+                    { name: "paprika", amount: 2, unit: "tsp", category: "Spices" },
+                    { name: "turmeric", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "cinnamon", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "cayenne pepper", amount: 0.25, unit: "tsp", category: "Spices" },
+                    { name: "salt", amount: 1.5, unit: "tsp", category: "Spices" },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "pita bread", amount: 6, unit: "", category: "Bread & Bakery" },
+                    { name: "tahini sauce", amount: 0.5, unit: "cup", category: "Condiments" },
+                    { name: "cucumber", amount: 1, unit: "", category: "Produce" },
+                    { name: "tomatoes", amount: 2, unit: "", category: "Produce" },
+                    { name: "red onion", amount: 0.5, unit: "", category: "Produce" }
+                ],
+                instructions: [
+                    "In a bowl, mix olive oil, lemon juice, minced garlic, and all spices.",
+                    "Add chicken and toss to coat. Marinate for at least 2 hours, preferably overnight.",
+                    "Preheat oven to 425°F (220°C).",
+                    "Spread chicken on a baking sheet and roast for 30-35 minutes until edges are crispy.",
+                    "Let chicken rest for 5 minutes, then slice thinly.",
+                    "Warm pita bread in the oven for 2-3 minutes.",
+                    "Slice cucumber, tomatoes, and red onion.",
+                    "Assemble shawarma by filling pita with chicken, vegetables, and tahini sauce."
+                ],
+                nutrition: {
+                    calories: 410,
+                    protein: 32,
+                    carbs: 28,
+                    fat: 20
+                },
+                prepTime: 15,
+                cookTime: 35,
+                servings: 6
+            },
+            {
+                id: 16,
+                name: "Chicken Marsala",
+                description: "Italian-American classic with chicken cutlets, mushrooms, and Marsala wine sauce.",
+                image: "🍄",
+                ingredients: [
+                    { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
+                    { name: "all-purpose flour", amount: 0.5, unit: "cup", category: "Dry Goods" },
+                    { name: "mushrooms", amount: 8, unit: "oz", category: "Produce" },
+                    { name: "shallots", amount: 2, unit: "", category: "Produce" },
+                    { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                    { name: "Marsala wine", amount: 0.75, unit: "cup", category: "Alcoholic Beverages" },
+                    { name: "chicken broth", amount: 0.75, unit: "cup", category: "Canned Goods" },
+                    { name: "butter", amount: 4, unit: "tbsp", category: "Dairy" },
+                    { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                    { name: "fresh thyme", amount: 1, unit: "tbsp", category: "Produce" },
+                    { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "fresh parsley", amount: 2, unit: "tbsp", category: "Produce" }
+                ],
+                instructions: [
+                    "Butterfly chicken breasts and pound to 1/4-inch thickness.",
+                    "Season chicken with salt and pepper, then dredge in flour.",
+                    "Heat 1 tbsp each of butter and olive oil in a large skillet over medium-high heat.",
+                    "Cook chicken until golden, about 3-4 minutes per side. Transfer to a plate.",
+                    "In the same skillet, add remaining oil and butter. Add sliced mushrooms and cook until browned, about 5 minutes.",
+                    "Add minced shallots and garlic, cook for 1 minute.",
+                    "Pour in Marsala wine, scraping up browned bits. Simmer for 2 minutes.",
+                    "Add chicken broth and thyme, simmer until sauce is reduced by half, about 5 minutes.",
+                    "Return chicken to the skillet and simmer for 2 minutes until heated through.",
+                    "Garnish with chopped parsley before serving."
+                ],
+                nutrition: {
+                    calories: 380,
+                    protein: 35,
+                    carbs: 12,
+                    fat: 18
+                },
+                prepTime: 15,
+                cookTime: 25,
+                servings: 4
+            },
+            {
+                id: 17,
+                name: "BBQ Chicken Pizza",
+                description: "Homemade pizza topped with tangy BBQ sauce, grilled chicken, red onions, and cheese.",
+                image: "🍕",
+                ingredients: [
+                    { name: "pizza dough", amount: 1, unit: "lb", category: "Bread & Bakery" },
+                    { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
+                    { name: "BBQ sauce", amount: 0.5, unit: "cup", category: "Condiments" },
+                    { name: "mozzarella cheese", amount: 2, unit: "cups", category: "Dairy" },
+                    { name: "red onion", amount: 0.5, unit: "", category: "Produce" },
+                    { name: "cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+                    { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                    { name: "garlic powder", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "cornmeal", amount: 2, unit: "tbsp", category: "Dry Goods" }
+                ],
+                instructions: [
+                    "Preheat oven to 475°F (245°C) with a pizza stone if available.",
+                    "Season chicken with salt, pepper, and garlic powder. Cook until no longer pink, about 6 minutes per side.",
+                    "Let chicken cool slightly, then dice or shred.",
+                    "Roll out pizza dough on a surface dusted with cornmeal.",
+                    "Brush dough with olive oil and spread BBQ sauce over it, leaving a 1-inch border.",
+                    "Top with chicken, thinly sliced red onion, and mozzarella cheese.",
+                    "Transfer pizza to preheated stone or baking sheet.",
+                    "Bake for 12-15 minutes until crust is golden and cheese is bubbly.",
+                    "Sprinkle with chopped cilantro before serving."
+                ],
+                nutrition: {
+                    calories: 420,
+                    protein: 28,
+                    carbs: 45,
+                    fat: 15
+                },
+                prepTime: 20,
+                cookTime: 25,
+                servings: 4
+            },
+            {
+                id: 18,
+                name: "Chicken Lettuce Wraps",
+                description: "Asian-inspired minced chicken with water chestnuts and hoisin sauce in crisp lettuce cups.",
+                image: "🥬",
+                ingredients: [
+                    { name: "ground chicken", amount: 1, unit: "lb", category: "Meat" },
+                    { name: "butter lettuce", amount: 1, unit: "head", category: "Produce" },
+                    { name: "water chestnuts", amount: 8, unit: "oz", category: "Canned Goods" },
+                    { name: "mushrooms", amount: 8, unit: "oz", category: "Produce" },
+                    { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                    { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+                    { name: "green onions", amount: 4, unit: "", category: "Produce" },
+                    { name: "hoisin sauce", amount: 0.25, unit: "cup", category: "Condiments" },
+                    { name: "soy sauce", amount: 2, unit: "tbsp", category: "Condiments" },
+                    { name: "rice vinegar", amount: 1, unit: "tbsp", category: "Oils & Vinegars" },
+                    { name: "sesame oil", amount: 2, unit: "tsp", category: "Oils & Vinegars" },
+                    { name: "sriracha", amount: 1, unit: "tsp", category: "Condiments" },
+                    { name: "vegetable oil", amount: 1, unit: "tbsp", category: "Oils & Vinegars" }
+                ],
+                instructions: [
+                    "Heat vegetable oil in a large skillet over medium-high heat.",
+                    "Add ground chicken and cook until browned, breaking it up as it cooks, about 5 minutes.",
+                    "Add minced garlic, ginger, and white parts of green onions. Cook for 1 minute.",
+                    "Add finely chopped mushrooms and water chestnuts. Cook for 2-3 minutes.",
+                    "Stir in hoisin sauce, soy sauce, rice vinegar, sesame oil, and sriracha.",
+                    "Cook for another 2 minutes until well combined and heated through.",
+                    "Separate lettuce leaves and arrange on a plate.",
+                    "Spoon chicken mixture into lettuce cups and garnish with sliced green onion tops.",
+                    "Serve with additional hoisin sauce or sriracha if desired."
+                ],
+                nutrition: {
+                    calories: 240,
+                    protein: 22,
+                    carbs: 12,
+                    fat: 12
+                },
+                prepTime: 15,
+                cookTime: 15,
+                servings: 4
+            },
+            {
+                id: 19,
+                name: "Chicken Piccata",
+                description: "Tender chicken cutlets in a bright lemon-caper sauce. An Italian restaurant favorite made easy.",
+                image: "🍋",
+                ingredients: [
+                    { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
+                    { name: "all-purpose flour", amount: 0.5, unit: "cup", category: "Dry Goods" },
+                    { name: "butter", amount: 4, unit: "tbsp", category: "Dairy" },
+                    { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                    { name: "chicken broth", amount: 0.75, unit: "cup", category: "Canned Goods" },
+                    { name: "lemon juice", amount: 0.25, unit: "cup", category: "Produce" },
+                    { name: "capers", amount: 3, unit: "tbsp", category: "Condiments" },
+                    { name: "lemon", amount: 1, unit: "", category: "Produce" },
+                    { name: "fresh parsley", amount: 2, unit: "tbsp", category: "Produce" },
+                    { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" }
+                ],
+                instructions: [
+                    "Butterfly chicken breasts and pound to 1/4-inch thickness.",
+                    "Season chicken with salt and pepper, then dredge in flour.",
+                    "Heat 1 tbsp each of butter and olive oil in a large skillet over medium-high heat.",
+                    "Cook chicken until golden, about 3 minutes per side. Transfer to a plate.",
+                    "In the same skillet, add chicken broth, lemon juice, and capers. Bring to a boil.",
+                    "Reduce heat and simmer until sauce is reduced by half, about 5 minutes.",
+                    "Remove from heat and whisk in remaining butter.",
+                    "Return chicken to the skillet and spoon sauce over it.",
+                    "Garnish with lemon slices and chopped parsley before serving."
+                ],
+                nutrition: {
+                    calories: 350,
+                    protein: 35,
+                    carbs: 10,
+                    fat: 18
+                },
+                prepTime: 15,
+                cookTime: 20,
+                servings: 4
+            },
+            {
+                id: 20,
+                name: "Chicken Biryani",
+                description: "Fragrant Indian rice dish with spiced chicken, caramelized onions, and aromatic basmati rice.",
+                image: "🍚",
+                ingredients: [
+                    { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                    { name: "basmati rice", amount: 2, unit: "cups", category: "Dry Goods" },
+                    { name: "onions", amount: 2, unit: "large", category: "Produce" },
+                    { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                    { name: "ginger", amount: 2, unit: "tbsp", category: "Produce" },
+                    { name: "yogurt", amount: 0.5, unit: "cup", category: "Dairy" },
+                    { name: "tomatoes", amount: 2, unit: "", category: "Produce" },
+                    { name: "garam masala", amount: 2, unit: "tbsp", category: "Spices" },
+                    { name: "ground cumin", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "ground coriander", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "turmeric", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "red chili powder", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "saffron threads", amount: 1, unit: "pinch", category: "Spices" },
+                    { name: "warm milk", amount: 0.25, unit: "cup", category: "Dairy" },
+                    { name: "ghee or oil", amount: 0.25, unit: "cup", category: "Oils & Vinegars" },
+                    { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+                    { name: "fresh mint", amount: 0.25, unit: "cup", category: "Produce" }
+                ],
+                instructions: [
+                    "Soak rice in water for 30 minutes, then drain.",
+                    "Marinate chicken in yogurt, half the garam masala, cumin, coriander, turmeric, chili powder, and salt for at least 1 hour.",
+                    "Soak saffron in warm milk and set aside.",
+                    "Heat ghee in a large pot and fry sliced onions until golden brown. Remove half and set aside.",
+                    "Add minced garlic and ginger to the pot, sauté for 1 minute.",
+                    "Add marinated chicken and cook until it starts to brown, about 5 minutes.",
+                    "Add chopped tomatoes and cook for another 5 minutes.",
+                    "In a separate pot, parboil rice with whole spices until 70% cooked. Drain.",
+                    "Layer half the rice over the chicken, sprinkle with half the fried onions, cilantro, and mint.",
+                    "Add remaining rice, then top with remaining onions, herbs, and saffron milk.",
+                    "Cover tightly and cook on low heat for 20 minutes.",
+                    "Let rest for 10 minutes before serving."
+                ],
+                nutrition: {
+                    calories: 480,
+                    protein: 30,
+                    carbs: 45,
+                    fat: 20
+                },
+                prepTime: 30,
+                cookTime: 60,
+                servings: 6
+            },
+            {
+                id: 21,
+                name: "Chicken Cordon Bleu",
+                description: "Breaded chicken breasts stuffed with ham and Swiss cheese, baked until golden and juicy.",
+                image: "🧀",
+                ingredients: [
+                    { name: "chicken breasts", amount: 4, unit: "", category: "Meat" },
+                    { name: "ham", amount: 8, unit: "slices", category: "Meat" },
+                    { name: "Swiss cheese", amount: 4, unit: "slices", category: "Dairy" },
+                    { name: "eggs", amount: 2, unit: "", category: "Dairy" },
+                    { name: "breadcrumbs", amount: 1, unit: "cup", category: "Dry Goods" },
+                    { name: "all-purpose flour", amount: 0.5, unit: "cup", category: "Dry Goods" },
+                    { name: "butter", amount: 4, unit: "tbsp", category: "Dairy" },
+                    { name: "dijon mustard", amount: 2, unit: "tsp", category: "Condiments" },
+                    { name: "dried thyme", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "garlic powder", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" }
+                ],
+                instructions: [
+                    "Preheat oven to 375°F (190°C).",
+                    "Butterfly each chicken breast and pound to 1/4-inch thickness.",
+                    "Season chicken with salt and pepper.",
+                    "Spread a thin layer of dijon mustard on each chicken breast.",
+                    "Place 2 slices of ham and 1 slice of Swiss cheese on each breast.",
+                    "Roll up tightly and secure with toothpicks.",
+                    "Set up breading station: flour in one dish, beaten eggs in another, and breadcrumbs mixed with thyme and garlic powder in a third.",
+                    "Dredge each chicken roll in flour, then dip in egg, and coat with breadcrumbs.",
+                    "Melt butter in an oven-safe skillet and brown chicken rolls on all sides.",
+                    "Transfer skillet to oven and bake for 25-30 minutes until chicken is cooked through.",
+                    "Let rest for 5 minutes before slicing and serving."
+                ],
+                nutrition: {
+                    calories: 450,
+                    protein: 40,
+                    carbs: 15,
+                    fat: 25
+                },
+                prepTime: 25,
+                cookTime: 35,
+                servings: 4
+            },
+            {
+                id: 22,
+                name: "Coconut Curry Chicken",
+                description: "Creamy Thai-inspired curry with tender chicken pieces, vegetables, and aromatic spices.",
+                image: "🥥",
+                ingredients: [
+                    { name: "chicken thighs", amount: 1.5, unit: "lbs", category: "Meat" },
+                    { name: "coconut milk", amount: 14, unit: "oz", category: "Canned Goods" },
+                    { name: "red curry paste", amount: 3, unit: "tbsp", category: "Condiments" },
+                    { name: "bell peppers", amount: 2, unit: "", category: "Produce" },
+                    { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+                    { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                    { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+                    { name: "fish sauce", amount: 1, unit: "tbsp", category: "Condiments" },
+                    { name: "brown sugar", amount: 1, unit: "tbsp", category: "Dry Goods" },
+                    { name: "lime juice", amount: 2, unit: "tbsp", category: "Produce" },
+                    { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                    { name: "fresh basil", amount: 0.25, unit: "cup", category: "Produce" },
+                    { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+                ],
+                instructions: [
+                    "Cut chicken into bite-sized pieces.",
+                    "Heat oil in a large skillet or wok over medium-high heat.",
+                    "Add onion and cook until softened, about 3 minutes.",
+                    "Add minced garlic and ginger, cook for 30 seconds until fragrant.",
+                    "Add curry paste and cook for 1 minute, stirring constantly.",
+                    "Add chicken and cook until no longer pink on the outside, about 5 minutes.",
+                    "Pour in coconut milk, fish sauce, and brown sugar. Bring to a simmer.",
+                    "Add sliced bell peppers and simmer for 10-15 minutes until chicken is cooked through and sauce thickens slightly.",
+                    "Stir in lime juice and remove from heat.",
+                    "Garnish with fresh basil and cilantro before serving over rice."
+                ],
+                nutrition: {
+                    calories: 390,
+                    protein: 28,
+                    carbs: 10,
+                    fat: 26
+                },
+                prepTime: 15,
+                cookTime: 25,
+                servings: 4
+            },
+            {
+                id: 23,
+                name: "Chicken and Dumplings",
+                description: "Classic Southern comfort food with tender chicken, vegetables, and fluffy dumplings in rich broth.",
+                image: "🍲",
+                ingredients: [
+                    { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                    { name: "carrots", amount: 3, unit: "", category: "Produce" },
+                    { name: "celery stalks", amount: 3, unit: "", category: "Produce" },
+                    { name: "onion", amount: 1, unit: "large", category: "Produce" },
+                    { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                    { name: "chicken broth", amount: 6, unit: "cups", category: "Canned Goods" },
+                    { name: "all-purpose flour", amount: 2, unit: "cups", category: "Dry Goods" },
+                    { name: "baking powder", amount: 1, unit: "tbsp", category: "Dry Goods" },
+                    { name: "butter", amount: 3, unit: "tbsp", category: "Dairy" },
+                    { name: "milk", amount: 0.75, unit: "cup", category: "Dairy" },
+                    { name: "dried thyme", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "dried sage", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "bay leaves", amount: 2, unit: "", category: "Spices" },
+                    { name: "salt", amount: 1.5, unit: "tsp", category: "Spices" },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "fresh parsley", amount: 0.25, unit: "cup", category: "Produce" }
+                ],
+                instructions: [
+                    "In a large Dutch oven, heat 1 tbsp butter over medium heat.",
+                    "Season chicken with salt and pepper, then brown on all sides, about 8 minutes. Remove and set aside.",
+                    "Add diced onion, carrots, and celery to the pot. Cook until softened, about 5 minutes.",
+                    "Add minced garlic, thyme, and sage. Cook for 30 seconds.",
+                    "Return chicken to the pot and add chicken broth and bay leaves. Bring to a boil.",
+                    "Reduce heat, cover, and simmer for 25 minutes until chicken is cooked through.",
+                    "Remove chicken, shred it, and return to the pot.",
+                    "For dumplings, whisk together flour, baking powder, and 1/2 tsp salt in a bowl.",
+                    "Cut in 2 tbsp cold butter until mixture resembles coarse crumbs.",
+                    "Stir in milk until a soft dough forms.",
+                    "Drop tablespoons of dough onto simmering stew.",
+                    "Cover and cook for 15 minutes until dumplings are cooked through.",
+                    "Garnish with chopped parsley before serving."
+                ],
+                nutrition: {
+                    calories: 420,
+                    protein: 32,
+                    carbs: 35,
+                    fat: 18
+                },
+                prepTime: 20,
+                cookTime: 60,
+                servings: 6
+            },
+            {
+                id: 24,
+                name: "Chicken Cacciatore",
+                description: "Italian hunter-style chicken with tomatoes, bell peppers, and herbs in a rich sauce.",
+                image: "🍅",
+                ingredients: [
+                    { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                    { name: "onion", amount: 1, unit: "large", category: "Produce" },
+                    { name: "bell peppers", amount: 2, unit: "", category: "Produce" },
+                    { name: "mushrooms", amount: 8, unit: "oz", category: "Produce" },
+                    { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                    { name: "diced tomatoes", amount: 28, unit: "oz", category: "Canned Goods" },
+                    { name: "tomato paste", amount: 2, unit: "tbsp", category: "Canned Goods" },
+                    { name: "red wine", amount: 0.5, unit: "cup", category: "Alcoholic Beverages" },
+                    { name: "chicken broth", amount: 0.5, unit: "cup", category: "Canned Goods" },
+                    { name: "dried oregano", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "dried basil", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "bay leaves", amount: 2, unit: "", category: "Spices" },
+                    { name: "olive oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                    { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+                    { name: "fresh parsley", amount: 0.25, unit: "cup", category: "Produce" }
+                ],
+                instructions: [
+                    "Season chicken with salt and pepper.",
+                    "Heat olive oil in a large skillet or Dutch oven over medium-high heat.",
+                    "Brown chicken on both sides, about 4 minutes per side. Remove and set aside.",
+                    "In the same pan, add diced onion, bell peppers, and mushrooms. Cook until softened, about 5 minutes.",
+                    "Add minced garlic and cook for 30 seconds until fragrant.",
+                    "Stir in tomato paste and cook for 1 minute.",
+                    "Pour in red wine, scraping up browned bits from the bottom of the pan.",
+                    "Add diced tomatoes, chicken broth, oregano, basil, and bay leaves.",
+                    "Return chicken to the pan, bring to a boil, then reduce heat to low.",
+                    "Cover and simmer for 45 minutes until chicken is tender and sauce has thickened.",
+                    "Remove bay leaves and garnish with chopped parsley before serving."
+                ],
+                nutrition: {
+                    calories: 360,
+                    protein: 30,
+                    carbs: 15,
+                    fat: 18
+                },
+                prepTime: 15,
+                cookTime: 60,
+                servings: 6
+            },
+    ];
+
+    // DOM elements
+    const recipesContainer = document.getElementById('recipes-container');
+    const recipeSearch = document.getElementById('recipe-search');
+    const allTab = document.getElementById('all-tab');
+    const selectedTab = document.getElementById('selected-tab');
+    const selectedRecipesContainer = document.getElementById('selected-recipes');
+    const generateListBtn = document.getElementById('generate-list');
+    const shoppingListContainer = document.getElementById('shopping-list-container');
+    const shoppingList = document.getElementById('shopping-list');
+    const clearListBtn = document.getElementById('clear-list');
+    const printListBtn = document.getElementById('print-list');
+    const recipeModal = document.getElementById('recipe-modal');
+    const closeModal = document.getElementById('close-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalImage = document.getElementById('modal-image');
+    const modalIngredients = document.getElementById('modal-ingredients');
+    const modalInstructions = document.getElementById('modal-instructions');
+    const modalNutrition = document.getElementById('modal-nutrition');
+    const modalAddRecipe = document.getElementById('modal-add-recipe');
+    const modalPortion = document.getElementById('modal-portion');
+    const decreasePortion = document.getElementById('decrease-portion');
+    const increasePortion = document.getElementById('increase-portion');
+    const portionBtns = document.querySelectorAll('.portion-btn');
+
+    // App state
+    let selectedRecipes = [];
+    let currentRecipe = null;
+    let defaultPortionSize = 2;
+    let currentView = 'all'; // 'all' or 'selected'
+
+    // Initialize the app
+    function init() {
+        renderRecipes();
+        setupEventListeners();
+    }
+
+    // Render recipe cards
+    function renderRecipes() {
+        recipesContainer.innerHTML = '';
+        
+        const recipesToRender = currentView === 'all' 
+            ? recipes 
+            : recipes.filter(recipe => selectedRecipes.some(r => r.id === recipe.id));
+        
+        const searchTerm = recipeSearch.value.toLowerCase();
+        
+        const filteredRecipes = recipesToRender.filter(recipe => 
+            recipe.name.toLowerCase().includes(searchTerm) || 
+            recipe.description.toLowerCase().includes(searchTerm)
+        );
+        
+        if (filteredRecipes.length === 0) {
+            recipesContainer.innerHTML = `
+                <div class="col-span-2 text-center py-8 text-gray-500">
+                    No recipes found matching "${searchTerm}"
+                </div>
+            `;
+            return;
+        }
+        
+        filteredRecipes.forEach(recipe => {
+            const isSelected = selectedRecipes.some(r => r.id === recipe.id);
+            
+            const card = document.createElement('div');
+            card.className = `recipe-card bg-white border ${isSelected ? 'border-orange-500' : 'border-gray-200'} rounded-lg overflow-hidden shadow-sm hover:shadow-md`;
+            card.innerHTML = `
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">${recipe.name}</h3>
+                        <div class="text-4xl">${recipe.image}</div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">${recipe.description}</p>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span>Prep: ${recipe.prepTime} min</span>
+                        <span>Cook: ${recipe.cookTime} min</span>
+                        <span>${recipe.servings} servings</span>
+                    </div>
+                    <div class="mt-4 flex justify-between items-center">
+                        <button class="view-recipe text-orange-600 hover:text-orange-700 text-sm font-medium" data-id="${recipe.id}">
+                            View Recipe
+                        </button>
+                        <button class="toggle-recipe ${isSelected ? 'text-orange-600 hover:text-orange-700' : 'text-gray-600 hover:text-gray-700'} text-sm font-medium" data-id="${recipe.id}">
+                            ${isSelected ? 'Remove' : 'Add to List'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            recipesContainer.appendChild(card);
+        });
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+        // Search functionality
+        recipeSearch.addEventListener('input', renderRecipes);
+        
+        // Tab switching
+        allTab.addEventListener('click', () => {
+            allTab.classList.add('tab-active');
+            selectedTab.classList.remove('tab-active');
+            currentView = 'all';
+            renderRecipes();
+        });
+        
+        selectedTab.addEventListener('click', () => {
+            selectedTab.classList.add('tab-active');
+            allTab.classList.remove('tab-active');
+            currentView = 'selected';
+            renderRecipes();
+        });
+        
+        // Recipe card buttons
+        recipesContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-recipe')) {
+                const recipeId = parseInt(e.target.dataset.id);
+                openRecipeModal(recipeId);
+            }
+            
+            if (e.target.classList.contains('toggle-recipe')) {
+                const recipeId = parseInt(e.target.dataset.id);
+                toggleRecipeSelection(recipeId);
+            }
+        });
+        
+        // Modal events
+        closeModal.addEventListener('click', () => {
+            recipeModal.classList.add('hidden');
+        });
+        
+        modalAddRecipe.addEventListener('click', () => {
+            if (currentRecipe) {
+                const portion = parseInt(modalPortion.textContent);
+                addRecipeToSelection(currentRecipe.id, portion);
+                recipeModal.classList.add('hidden');
+            }
+        });
+        
+        decreasePortion.addEventListener('click', () => {
+            let portion = parseInt(modalPortion.textContent);
+            if (portion > 1) {
+                portion--;
+                modalPortion.textContent = portion;
+                updateModalIngredients(portion);
+            }
+        });
+        
+        increasePortion.addEventListener('click', () => {
+            let portion = parseInt(modalPortion.textContent);
+            portion++;
+            modalPortion.textContent = portion;
+            updateModalIngredients(portion);
+        });
+        
+        // Default portion size buttons
+        portionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                portionBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                defaultPortionSize = parseInt(btn.dataset.portion);
+            });
+        });
+        
+        // Generate shopping list
+        generateListBtn.addEventListener('click', generateShoppingList);
+        
+        // Clear shopping list
+        clearListBtn.addEventListener('click', () => {
+            selectedRecipes = [];
+            updateSelectedRecipesDisplay();
+            shoppingListContainer.classList.add('hidden');
+            generateListBtn.disabled = true;
+        });
+        
+        // Print shopping list
+        printListBtn.addEventListener('click', () => {
+            const printContent = document.createElement('div');
+            printContent.innerHTML = `
+                <h1 style="font-size: 24px; margin-bottom: 16px;">Shopping List</h1>
+                <h2 style="font-size: 18px; margin-bottom: 8px;">Recipes:</h2>
+                <ul style="margin-bottom: 16px;">
+                    ${selectedRecipes.map(recipe => `
+                        <li>${recipe.name} (${recipe.portionSize} servings)</li>
+                    `).join('')}
+                </ul>
+                ${shoppingList.innerHTML}
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Shopping List</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; }
+                            h3 { margin-top: 16px; margin-bottom: 8px; }
+                            .shopping-list-item { margin-bottom: 4px; }
+                        </style>
+                    </head>
+                    <body>
+                        ${printContent.innerHTML}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        });
+        
+        // Close modal when clicking outside
+        recipeModal.addEventListener('click', (e) => {
+            if (e.target === recipeModal) {
+                recipeModal.classList.add('hidden');
+            }
+        });
+    }
+
+    // Open recipe modal
+    function openRecipeModal(recipeId) {
+        const recipe = recipes.find(r => r.id === recipeId);
+        if (!recipe) return;
+        
+        currentRecipe = recipe;
+        
+        modalTitle.textContent = recipe.name;
+        modalImage.innerHTML = `<div class="text-8xl flex items-center justify-center h-full">${recipe.image}</div>`;
+        
+        // Set default portion size
+        const selectedRecipe = selectedRecipes.find(r => r.id === recipeId);
+        const portionSize = selectedRecipe ? selectedRecipe.portionSize : defaultPortionSize;
+        modalPortion.textContent = portionSize;
+        
+        // Update ingredients with portion size
+        updateModalIngredients(portionSize);
+        
+        // Instructions
+        modalInstructions.innerHTML = '';
+        recipe.instructions.forEach(instruction => {
+            const li = document.createElement('li');
+            li.textContent = instruction;
+            modalInstructions.appendChild(li);
+        });
+        
+        // Nutrition
+        modalNutrition.innerHTML = `
+            <div>Calories: ${recipe.nutrition.calories}</div>
+            <div>Protein: ${recipe.nutrition.protein}g</div>
+            <div>Carbs: ${recipe.nutrition.carbs}g</div>
+            <div>Fat: ${recipe.nutrition.fat}g</div>
+        `;
+        
+        // Update button text
+        const isSelected = selectedRecipes.some(r => r.id === recipeId);
+        modalAddRecipe.textContent = isSelected ? 'Update in Shopping List' : 'Add to Shopping List';
+        
+        recipeModal.classList.remove('hidden');
+    }
+
+    // Update modal ingredients based on portion size
+    function updateModalIngredients(portionSize) {
+        if (!currentRecipe) return;
+        
+        modalIngredients.innerHTML = '';
+        const ratio = portionSize / currentRecipe.servings;
+        
+        currentRecipe.ingredients.forEach(ingredient => {
+            const adjustedAmount = (ingredient.amount * ratio).toFixed(2).replace(/\.00$/, '');
+            const li = document.createElement('li');
+            li.textContent = `${adjustedAmount} ${ingredient.unit} ${ingredient.name}`;
+            modalIngredients.appendChild(li);
+        });
+    }
+
+    // Toggle recipe selection
+    function toggleRecipeSelection(recipeId) {
+        const existingIndex = selectedRecipes.findIndex(r => r.id === recipeId);
+        
+        if (existingIndex >= 0) {
+            selectedRecipes.splice(existingIndex, 1);
+        } else {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (recipe) {
+                selectedRecipes.push({
+                    id: recipe.id,
+                    name: recipe.name,
+                    portionSize: defaultPortionSize,
+                    ingredients: recipe.ingredients
+                });
+            }
+        }
+        
+        updateSelectedRecipesDisplay();
+        renderRecipes();
+    }
+
+    // Add recipe to selection with specific portion size
+    function addRecipeToSelection(recipeId, portionSize) {
+        const existingIndex = selectedRecipes.findIndex(r => r.id === recipeId);
+        const recipe = recipes.find(r => r.id === recipeId);
+        
+        if (!recipe) return;
+        
+        if (existingIndex >= 0) {
+            selectedRecipes[existingIndex].portionSize = portionSize;
+        } else {
+            selectedRecipes.push({
+                id: recipe.id,
+                name: recipe.name,
+                portionSize: portionSize,
+                ingredients: recipe.ingredients
+            });
+        }
+        
+        updateSelectedRecipesDisplay();
+        renderRecipes();
+    }
+
+    // Update selected recipes display
+    function updateSelectedRecipesDisplay() {
+        if (selectedRecipes.length === 0) {
+            selectedRecipesContainer.innerHTML = `<div class="text-gray-500 italic">No recipes selected yet</div>`;
+            generateListBtn.disabled = true;
+        } else {
+            selectedRecipesContainer.innerHTML = '';
+            selectedRecipes.forEach(recipe => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center py-2 border-b border-gray-100';
+                div.innerHTML = `
+                    <span class="text-gray-800">${recipe.name}</span>
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-600 mr-2">${recipe.portionSize} servings</span>
+                        <button class="remove-recipe text-gray-400 hover:text-red-500" data-id="${recipe.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                div.querySelector('.remove-recipe').addEventListener('click', () => {
+                    toggleRecipeSelection(recipe.id);
+                });
+                
+                selectedRecipesContainer.appendChild(div);
+            });
+            generateListBtn.disabled = false;
+        }
+    }
+
+    // Generate shopping list
+    function generateShoppingList() {
+        if (selectedRecipes.length === 0) return;
+        
+        // Combine ingredients from all selected recipes
+        const combinedIngredients = {};
+        
+        selectedRecipes.forEach(selectedRecipe => {
+            const recipe = recipes.find(r => r.id === selectedRecipe.id);
+            if (!recipe) return;
+            
+            const ratio = selectedRecipe.portionSize / recipe.servings;
+            
+            recipe.ingredients.forEach(ingredient => {
+                const key = `${ingredient.name}|${ingredient.unit}|${ingredient.category}`;
+                const adjustedAmount = ingredient.amount * ratio;
+                
+                if (combinedIngredients[key]) {
+                    combinedIngredients[key].amount += adjustedAmount;
+                } else {
+                    combinedIngredients[key] = {
+                        name: ingredient.name,
+                        amount: adjustedAmount,
+                        unit: ingredient.unit,
+                        category: ingredient.category
+                    };
+                }
+            });
+        });
+        
+        // Group by category
+        const groupedIngredients = {};
+        
+        Object.values(combinedIngredients).forEach(ingredient => {
+            if (!groupedIngredients[ingredient.category]) {
+                groupedIngredients[ingredient.category] = [];
+            }
+            groupedIngredients[ingredient.category].push(ingredient);
+        });
+        
+        // Render shopping list
+        shoppingList.innerHTML = '';
+        
+        Object.keys(groupedIngredients).sort().forEach(category => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'mb-4';
+            categoryDiv.innerHTML = `
+                <h3 class="font-medium text-gray-700 mb-2">${category}</h3>
+                <div class="space-y-1">
+                    ${groupedIngredients[category].map(ingredient => {
+                        const formattedAmount = ingredient.amount.toFixed(2).replace(/\.00$/, '');
+                        return `
+                            <div class="shopping-list-item flex items-center">
+                                <input type="checkbox" class="mr-2 h-4 w-4 text-orange-600 rounded">
+                                <span class="text-gray-800">
+                                    ${formattedAmount} ${ingredient.unit} ${ingredient.name}
+                                </span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            shoppingList.appendChild(categoryDiv);
+        });
+        
+        shoppingListContainer.classList.remove('hidden');
+    }
+
+    // Initialize the app
+    init();
+</script>
+</body>
+</html>
