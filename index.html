@@ -9,9 +9,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         
        
-        body {
+    body {
         font-family: 'Poppins', sans-serif;
-        background-color: #FFF9F0;
+        background-color: #f8f5f0;
     }
     
     .recipe-card {
@@ -52,7 +52,6 @@
         color: white;
     }
     
-    /* Custom scrollbar */
     .custom-scrollbar::-webkit-scrollbar {
         width: 6px;
     }
@@ -66,12 +65,53 @@
         background: #ea580c;
         border-radius: 10px;
     }
+    
+    .category-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .category-btn.active {
+        background-color: #ea580c;
+        color: white;
+    }
+    
+    .category-btn:hover:not(.active) {
+        background-color: #fdba74;
+        color: white;
+    }
+    
+    .recipe-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge-chicken {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-mutton {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    
+    .badge-vegetarian {
+        background-color: #dcfce7;
+        color: #166534;
+    }
 </style>
 </head>
 <body>
      <div class="container mx-auto px-4 py-8 max-w-7x1">
 <header class="text-center mb-10">
-<h1 class="text-4xl font-bold text-orange-600 mb-2">Chicken Recipe Shopping List Builder</h1>
+<h1 class="text-4xl font-bold text-orange-600 mb-2">Veg & Non-Veg Recipe Shopping List Builder</h1>
 <p class="text-gray-600 max-w-2xl mx-auto">Select your favorite chicken recipes, adjust portion sizes, and generate a complete shopping list for your weekly meal prep.</p>
 </header>
     <div class="flex flex-col lg:flex-row gap-6">
@@ -80,6 +120,13 @@
             <div class="flex border-b border-gray-200 mb-6">
                 <button id="all-tab" class="tab-active px-4 py-2 focus:outline-none">All Recipes</button>
                 <button id="selected-tab" class="px-4 py-2 focus:outline-none">Selected Recipes</button>
+            </div>
+            
+            <div class="mb-4 flex flex-wrap gap-2">
+                <button class="category-btn active px-4 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-medium" data-category="all">All Types</button>
+                <button class="category-btn px-4 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-medium" data-category="chicken">Chicken</button>
+                <button class="category-btn px-4 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-medium" data-category="mutton">Mutton</button>
+                <button class="category-btn px-4 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-medium" data-category="vegetarian">Vegetarian</button>
             </div>
             
             <div class="mb-4">
@@ -153,6 +200,8 @@
                         <div id="modal-image" class="w-full h-64 bg-orange-100 rounded-lg mb-4 flex items-center justify-center"></div>
                         
                         <div class="mb-4">
+                            <div id="modal-category" class="mb-2 inline-block px-3 py-1 rounded-full text-sm font-medium"></div>
+                            
                             <h3 class="font-medium text-gray-800 mb-2">Adjust Portion Size</h3>
                             <div class="flex items-center">
                                 <button id="decrease-portion" class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center">-</button>
@@ -192,11 +241,13 @@
 <script>
     // Recipe data
     const recipes = [
+        // Chicken Recipes
         {
             id: 1,
             name: "Lemon Herb Roasted Chicken",
             description: "A classic roasted chicken with bright lemon and herb flavors, perfect for a Sunday dinner.",
             image: "🍗",
+            category: "chicken",
             ingredients: [
                 { name: "whole chicken", amount: 1, unit: "", category: "Meat" },
                 { name: "lemons", amount: 2, unit: "", category: "Produce" },
@@ -231,6 +282,7 @@
             name: "Chicken Tikka Masala",
             description: "Tender chunks of chicken in a creamy, spiced tomato sauce. A crowd-pleasing Indian favorite.",
             image: "🍛",
+            category: "chicken",
             ingredients: [
                 { name: "boneless chicken thighs", amount: 1.5, unit: "lbs", category: "Meat" },
                 { name: "plain yogurt", amount: 1, unit: "cup", category: "Dairy" },
@@ -271,6 +323,7 @@
             name: "Chicken Fajitas",
             description: "Sizzling hot strips of chicken with colorful bell peppers and onions, perfect for a quick weeknight meal.",
             image: "🌮",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
                 { name: "bell peppers", amount: 3, unit: "", category: "Produce" },
@@ -308,6 +361,7 @@
             name: "Chicken Parmesan",
             description: "Crispy breaded chicken topped with marinara sauce and melted cheese, served over pasta.",
             image: "🍝",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 2, unit: "large", category: "Meat" },
                 { name: "eggs", amount: 2, unit: "", category: "Dairy" },
@@ -348,6 +402,7 @@
             name: "Honey Garlic Chicken",
             description: "Sweet and sticky chicken with a delicious honey garlic sauce, ready in just 20 minutes.",
             image: "🍯",
+            category: "chicken",
             ingredients: [
                 { name: "chicken thighs", amount: 1.5, unit: "lbs", category: "Meat" },
                 { name: "honey", amount: 0.33, unit: "cup", category: "Condiments" },
@@ -386,6 +441,7 @@
             name: "Chicken Alfredo Pasta",
             description: "Creamy pasta with tender chicken and a rich parmesan sauce. Pure comfort food.",
             image: "🍲",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
                 { name: "fettuccine pasta", amount: 12, unit: "oz", category: "Dry Goods" },
@@ -424,6 +480,7 @@
             name: "Buffalo Chicken Wings",
             description: "Crispy chicken wings tossed in spicy buffalo sauce. Perfect for game day or any gathering.",
             image: "🍗",
+            category: "chicken",
             ingredients: [
                 { name: "chicken wings", amount: 2, unit: "lbs", category: "Meat" },
                 { name: "hot sauce", amount: 0.5, unit: "cup", category: "Condiments" },
@@ -457,6 +514,7 @@
             name: "Chicken Caesar Salad",
             description: "A classic salad with grilled chicken, crisp romaine, parmesan, and creamy Caesar dressing.",
             image: "🥗",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
                 { name: "romaine lettuce", amount: 2, unit: "heads", category: "Produce" },
@@ -495,6 +553,7 @@
             name: "Chicken Stir Fry",
             description: "Quick and colorful stir-fried chicken with crisp vegetables in a savory sauce.",
             image: "🥢",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
                 { name: "broccoli", amount: 2, unit: "cups", category: "Produce" },
@@ -535,6 +594,7 @@
             name: "Chicken Enchiladas",
             description: "Tortillas filled with seasoned chicken and cheese, topped with enchilada sauce and baked until bubbly.",
             image: "🌯",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
                 { name: "enchilada sauce", amount: 2, unit: "cups", category: "Canned Goods" },
@@ -572,6 +632,7 @@
             name: "Chicken Noodle Soup",
             description: "Comforting homemade soup with tender chicken, vegetables, and egg noodles.",
             image: "🍜",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
                 { name: "egg noodles", amount: 8, unit: "oz", category: "Dry Goods" },
@@ -613,6 +674,7 @@
             name: "Chicken Quesadillas",
             description: "Crispy tortillas filled with seasoned chicken, melted cheese, and sautéed peppers and onions.",
             image: "🧀",
+            category: "chicken",
             ingredients: [
                 { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
                 { name: "flour tortillas", amount: 8, unit: "large", category: "Bread & Bakery" },
@@ -648,6 +710,7 @@
                 name: "Teriyaki Chicken",
                 description: "Juicy chicken glazed with a sweet and savory homemade teriyaki sauce.",
                 image: "🍱",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
                     { name: "soy sauce", amount: 0.5, unit: "cup", category: "Condiments" },
@@ -687,6 +750,7 @@
                 name: "Chicken Pot Pie",
                 description: "Comforting pie filled with chicken, vegetables, and creamy sauce, topped with flaky pastry.",
                 image: "🥧",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
                     { name: "carrots", amount: 3, unit: "", category: "Produce" },
@@ -730,6 +794,7 @@
                 name: "Chicken Shawarma",
                 description: "Middle Eastern spiced chicken wrapped in warm pita with fresh vegetables and tahini sauce.",
                 image: "🥙",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
                     { name: "olive oil", amount: 0.25, unit: "cup", category: "Oils & Vinegars" },
@@ -773,6 +838,7 @@
                 name: "Chicken Marsala",
                 description: "Italian-American classic with chicken cutlets, mushrooms, and Marsala wine sauce.",
                 image: "🍄",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
                     { name: "all-purpose flour", amount: 0.5, unit: "cup", category: "Dry Goods" },
@@ -815,6 +881,7 @@
                 name: "BBQ Chicken Pizza",
                 description: "Homemade pizza topped with tangy BBQ sauce, grilled chicken, red onions, and cheese.",
                 image: "🍕",
+                category: "chicken",
                 ingredients: [
                     { name: "pizza dough", amount: 1, unit: "lb", category: "Bread & Bakery" },
                     { name: "chicken breasts", amount: 1, unit: "lb", category: "Meat" },
@@ -852,6 +919,7 @@
                 name: "Chicken Lettuce Wraps",
                 description: "Asian-inspired minced chicken with water chestnuts and hoisin sauce in crisp lettuce cups.",
                 image: "🥬",
+                category: "chicken",
                 ingredients: [
                     { name: "ground chicken", amount: 1, unit: "lb", category: "Meat" },
                     { name: "butter lettuce", amount: 1, unit: "head", category: "Produce" },
@@ -893,6 +961,7 @@
                 name: "Chicken Piccata",
                 description: "Tender chicken cutlets in a bright lemon-caper sauce. An Italian restaurant favorite made easy.",
                 image: "🍋",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken breasts", amount: 1.5, unit: "lbs", category: "Meat" },
                     { name: "all-purpose flour", amount: 0.5, unit: "cup", category: "Dry Goods" },
@@ -932,6 +1001,7 @@
                 name: "Chicken Biryani",
                 description: "Fragrant Indian rice dish with spiced chicken, caramelized onions, and aromatic basmati rice.",
                 image: "🍚",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
                     { name: "basmati rice", amount: 2, unit: "cups", category: "Dry Goods" },
@@ -980,6 +1050,7 @@
                 name: "Chicken Cordon Bleu",
                 description: "Breaded chicken breasts stuffed with ham and Swiss cheese, baked until golden and juicy.",
                 image: "🧀",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken breasts", amount: 4, unit: "", category: "Meat" },
                     { name: "ham", amount: 8, unit: "slices", category: "Meat" },
@@ -1022,6 +1093,7 @@
                 name: "Coconut Curry Chicken",
                 description: "Creamy Thai-inspired curry with tender chicken pieces, vegetables, and aromatic spices.",
                 image: "🥥",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken thighs", amount: 1.5, unit: "lbs", category: "Meat" },
                     { name: "coconut milk", amount: 14, unit: "oz", category: "Canned Goods" },
@@ -1064,6 +1136,7 @@
                 name: "Chicken and Dumplings",
                 description: "Classic Southern comfort food with tender chicken, vegetables, and fluffy dumplings in rich broth.",
                 image: "🍲",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
                     { name: "carrots", amount: 3, unit: "", category: "Produce" },
@@ -1112,6 +1185,7 @@
                 name: "Chicken Cacciatore",
                 description: "Italian hunter-style chicken with tomatoes, bell peppers, and herbs in a rich sauce.",
                 image: "🍅",
+                category: "chicken",
                 ingredients: [
                     { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
                     { name: "onion", amount: 1, unit: "large", category: "Produce" },
@@ -1153,368 +1227,1416 @@
                 cookTime: 60,
                 servings: 6
             },
+            {
+                id: 25,
+                name: "Butter Chicken",
+                description: "Rich and creamy Indian curry with tender chicken pieces in a tomato-based sauce.",
+                image: "🍛",
+                category: "chicken",
+                ingredients: [
+                { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "yogurt", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "lemon juice", amount: 2, unit: "tbsp", category: "Produce" },
+                { name: "garam masala", amount: 2, unit: "tsp", category: "Spices" },
+                { name: "turmeric", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "cumin", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "butter", amount: 4, unit: "tbsp", category: "Dairy" },
+                { name: "onion", amount: 1, unit: "large", category: "Produce" },
+                { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "tomato puree", amount: 1, unit: "cup", category: "Canned Goods" },
+                { name: "heavy cream", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "kasuri methi (dried fenugreek leaves)", amount: 1, unit: "tbsp", category: "Spices" },
+                { name: "sugar", amount: 1, unit: "tsp", category: "Baking" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" }
+                ],
+                instructions: [
+                "In a bowl, mix yogurt, lemon juice, 1 tsp garam masala, turmeric, and cumin.",
+                "Add chicken pieces and marinate for at least 30 minutes, preferably 2-4 hours.",
+                "Heat 2 tbsp butter in a large pot over medium heat.",
+                "Add chicken pieces and cook until browned on all sides. Remove and set aside.",
+                "In the same pot, add remaining butter, diced onion, minced garlic, and ginger.",
+                "Cook until onions are soft and golden, about 5 minutes.",
+                "Add tomato puree and cook for 10-15 minutes until sauce thickens.",
+                "Return chicken to the pot and simmer for 10 minutes.",
+                "Stir in heavy cream, remaining garam masala, kasuri methi, sugar, and salt.",
+                "Simmer for another 5-10 minutes until chicken is fully cooked and sauce is thick.",
+                "Serve with rice or naan bread."
+                ],
+                nutrition: {
+                calories: 480,
+                protein: 35,
+                carbs: 10,
+                fat: 32
+                },
+                prepTime: 15,
+                cookTime: 40,
+                servings: 6
+                },
+                {
+                id: 26,
+                name: "Chicken Korma",
+                description: "Mild and creamy chicken curry with a rich blend of spices and nuts.",
+                image: "🍲",
+                category: "chicken",
+                ingredients: [
+                { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "yogurt", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "onions", amount: 2, unit: "large", category: "Produce" },
+                { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "cashews", amount: 0.25, unit: "cup", category: "Nuts & Seeds" },
+                { name: "almonds", amount: 0.25, unit: "cup", category: "Nuts & Seeds" },
+                { name: "coconut milk", amount: 1, unit: "cup", category: "Canned Goods" },
+                { name: "coriander powder", amount: 2, unit: "tsp", category: "Spices" },
+                { name: "cumin powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "turmeric", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "cardamom pods", amount: 4, unit: "", category: "Spices" },
+                { name: "cinnamon stick", amount: 1, unit: "", category: "Spices" },
+                { name: "cloves", amount: 4, unit: "", category: "Spices" },
+                { name: "ghee", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+                ],
+                instructions: [
+                "Soak cashews and almonds in hot water for 30 minutes, then blend into a smooth paste.",
+                "In a bowl, mix yogurt with coriander powder, cumin powder, and turmeric. Add chicken and marinate for 30 minutes.",
+                "Heat ghee in a large pot over medium heat.",
+                "Add cardamom pods, cinnamon stick, and cloves. Cook for 30 seconds until fragrant.",
+                "Add finely chopped onions and cook until golden brown, about 8-10 minutes.",
+                "Add minced garlic and ginger, cook for 1 minute.",
+                "Add marinated chicken and cook for 5 minutes, stirring frequently.",
+                "Add nut paste and cook for another 5 minutes.",
+                "Pour in coconut milk and 1/2 cup water. Bring to a simmer.",
+                "Cover and cook on low heat for 20-25 minutes until chicken is tender.",
+                "Add garam masala and cook for another 5 minutes.",
+                "Garnish with chopped cilantro before serving."
+                ],
+                nutrition: {
+                calories: 450,
+                protein: 32,
+                carbs: 15,
+                fat: 30
+                },
+                prepTime: 45,
+                cookTime: 40,
+                servings: 6
+                },
+                {
+                id: 27,
+                name: "Chicken Biryani",
+                description: "Fragrant rice dish layered with spiced chicken, herbs, and caramelized onions.",
+                image: "🍚",
+                category: "chicken",
+                ingredients: [
+                { name: "chicken thighs", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "basmati rice", amount: 2, unit: "cups", category: "Dry Goods" },
+                { name: "yogurt", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "onions", amount: 3, unit: "large", category: "Produce" },
+                { name: "tomatoes", amount: 2, unit: "medium", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "green chilies", amount: 4, unit: "", category: "Produce" },
+                { name: "biryani masala", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "turmeric", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "red chili powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "coriander powder", amount: 1, unit: "tbsp", category: "Spices" },
+                { name: "cumin powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "saffron strands", amount: 1, unit: "pinch", category: "Spices" },
+                { name: "milk", amount: 0.25, unit: "cup", category: "Dairy" },
+                { name: "ghee", amount: 0.25, unit: "cup", category: "Oils & Vinegars" },
+                { name: "mint leaves", amount: 0.5, unit: "cup", category: "Produce" },
+                { name: "cilantro", amount: 0.5, unit: "cup", category: "Produce" }
+                ],
+                instructions: [
+                "Wash and soak rice for 30 minutes, then drain.",
+                "Marinate chicken with yogurt, half of ginger-garlic paste, turmeric, red chili powder, and salt for at least 2 hours.",
+                "Heat ghee in a large pot and fry sliced onions until golden brown. Remove half and set aside.",
+                "Add remaining ginger-garlic paste and green chilies to the pot, sauté for 1 minute.",
+                "Add coriander powder, cumin powder, and biryani masala. Cook for 1 minute.",
+                "Add marinated chicken and cook on high heat for 5 minutes, then cover and cook on low heat for 20 minutes.",
+                "Add chopped tomatoes and cook for another 5 minutes.",
+                "In a separate pot, parboil rice with whole spices until 70% cooked. Drain.",
+                "Soak saffron in warm milk.",
+                "Layer half the rice over the chicken, sprinkle with garam masala, fried onions, mint, and cilantro.",
+                "Add remaining rice, then top with remaining fried onions, herbs, and saffron milk.",
+                "Cover tightly with foil and lid, cook on low heat for 20 minutes.",
+                "Let rest for 10 minutes before serving."
+                ],
+                nutrition: {
+                calories: 520,
+                protein: 35,
+                carbs: 45,
+                fat: 22
+                },
+                prepTime: 30,
+                cookTime: 90,
+                servings: 6
+                },
+                {
+                id: 28,
+                name: "Tandoori Chicken",
+                description: "Juicy chicken marinated in yogurt and spices, traditionally cooked in a clay oven.",
+                image: "🍗",
+                category: "chicken",
+                ingredients: [
+                { name: "chicken legs", amount: 8, unit: "", category: "Meat" },
+                { name: "yogurt", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "lemon juice", amount: 2, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "tandoori masala", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "red chili powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "turmeric", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "cumin powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "coriander powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "red food coloring (optional)", amount: 1, unit: "pinch", category: "Baking" },
+                { name: "chat masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "lemon wedges", amount: 4, unit: "", category: "Produce" }
+                ],
+                instructions: [
+                "Make deep cuts in chicken legs with a sharp knife.",
+                "In a bowl, mix yogurt, lemon juice, garlic paste, ginger paste, and all spices.",
+                "Add food coloring if using, and mix well.",
+                "Add chicken to the marinade, ensuring it gets into the cuts. Cover and refrigerate for at least 4 hours, preferably overnight.",
+                "Preheat oven to 425°F (220°C) or prepare a grill.",
+                "Remove chicken from marinade, shaking off excess.",
+                "Brush with oil and place on a baking sheet or grill.",
+                "Cook for 35-40 minutes in the oven, turning halfway, or grill for 25-30 minutes until fully cooked.",
+                "Sprinkle with chat masala and garnish with cilantro.",
+                "Serve hot with lemon wedges and mint chutney."
+                ],
+                nutrition: {
+                calories: 320,
+                protein: 35,
+                carbs: 5,
+                fat: 18
+                },
+                prepTime: 15,
+                cookTime: 40,
+                servings: 4
+                },
+        
+        // Mutton Recipes
+        {
+            id: 1,
+            name: "Mutton Biryani",
+            description: "Aromatic rice dish with tender mutton pieces, fragrant spices, and caramelized onions.",
+            image: "🍚",
+            category: "mutton",
+            ingredients: [
+                { name: "mutton", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "basmati rice", amount: 2, unit: "cups", category: "Dry Goods" },
+                { name: "onions", amount: 3, unit: "large", category: "Produce" },
+                { name: "yogurt", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "ginger paste", amount: 2, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 2, unit: "tbsp", category: "Produce" },
+                { name: "green chilies", amount: 4, unit: "", category: "Produce" },
+                { name: "tomatoes", amount: 2, unit: "medium", category: "Produce" },
+                { name: "biryani masala", amount: 3, unit: "tbsp", category: "Spices" },
+                { name: "turmeric powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "red chili powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "saffron strands", amount: 1, unit: "pinch", category: "Spices" },
+                { name: "milk", amount: 0.25, unit: "cup", category: "Dairy" },
+                { name: "ghee", amount: 0.25, unit: "cup", category: "Oils & Vinegars" },
+                { name: "mint leaves", amount: 0.5, unit: "cup", category: "Produce" },
+                { name: "cilantro", amount: 0.5, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "Wash and soak rice for 30 minutes, then drain.",
+                "Marinate mutton with yogurt, half of ginger-garlic paste, turmeric, red chili powder, and salt for at least 2 hours.",
+                "Heat ghee in a large pot and fry sliced onions until golden brown. Remove half and set aside.",
+                "Add remaining ginger-garlic paste and green chilies to the pot, sauté for 1 minute.",
+                "Add marinated mutton and cook on high heat for 5 minutes, then cover and cook on low heat for 30 minutes.",
+                "Add chopped tomatoes and cook for another 10 minutes until mutton is tender.",
+                "In a separate pot, parboil rice with whole spices until 70% cooked. Drain.",
+                "Soak saffron in warm milk.",
+                "Layer half the rice over the mutton, sprinkle with biryani masala, fried onions, mint, and cilantro.",
+                "Add remaining rice, then top with remaining fried onions, herbs, and saffron milk.",
+                "Cover tightly with foil and lid, cook on low heat for 20 minutes.",
+                "Let rest for 10 minutes before serving."
+            ],
+            nutrition: {
+                calories: 520,
+                protein: 35,
+                carbs: 45,
+                fat: 22
+            },
+            prepTime: 30,
+            cookTime: 90,
+            servings: 6
+        },
+        {
+            id: 2,
+            name: "Mutton Rogan Josh",
+            description: "Classic Kashmiri curry with tender mutton in a rich, aromatic gravy with yogurt and spices.",
+            image: "🍲",
+            category: "mutton",
+            ingredients: [
+                { name: "mutton", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "yogurt", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "onions", amount: 2, unit: "large", category: "Produce" },
+                { name: "tomatoes", amount: 3, unit: "medium", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "Kashmiri red chili powder", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "fennel powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "ground cardamom", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "cinnamon stick", amount: 1, unit: "", category: "Spices" },
+                { name: "cloves", amount: 4, unit: "", category: "Spices" },
+                { name: "bay leaves", amount: 2, unit: "", category: "Spices" },
+                { name: "ghee", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "Heat ghee in a heavy-bottomed pot and add whole spices (cinnamon, cloves, bay leaves).",
+                "Add finely chopped onions and sauté until golden brown, about 10 minutes.",
+                "Add ginger-garlic paste and cook for 2 minutes until fragrant.",
+                "Add Kashmiri red chili powder and cook for 30 seconds.",
+                "Add mutton pieces and sear on high heat for 5 minutes.",
+                "Add chopped tomatoes, fennel powder, and salt. Cook for 5 minutes.",
+                "Whisk yogurt and add it slowly while stirring continuously.",
+                "Add 1 cup water, bring to a boil, then reduce heat to low.",
+                "Cover and simmer for 1-1.5 hours until mutton is tender.",
+                "Add garam masala and ground cardamom in the last 5 minutes of cooking.",
+                "Garnish with fresh cilantro before serving."
+            ],
+            nutrition: {
+                calories: 480,
+                protein: 38,
+                carbs: 12,
+                fat: 28
+            },
+            prepTime: 20,
+            cookTime: 100,
+            servings: 6
+        },
+        {
+            id: 3,
+            name: "Mutton Curry",
+            description: "Hearty and flavorful mutton curry with a thick, spiced gravy. Perfect with rice or bread.",
+            image: "🍛",
+            category: "mutton",
+            ingredients: [
+                { name: "mutton", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "onions", amount: 2, unit: "large", category: "Produce" },
+                { name: "tomatoes", amount: 3, unit: "medium", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "green chilies", amount: 3, unit: "", category: "Produce" },
+                { name: "curry powder", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "turmeric powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "coriander powder", amount: 1, unit: "tbsp", category: "Spices" },
+                { name: "cumin powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "vegetable oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "Heat oil in a large pot and sauté finely chopped onions until golden brown.",
+                "Add ginger-garlic paste and sliced green chilies, cook for 2 minutes.",
+                "Add turmeric, coriander, cumin, and curry powder. Cook for 1 minute.",
+                "Add mutton pieces and sear on high heat for 5 minutes.",
+                "Add chopped tomatoes and salt, cook for 5 minutes until tomatoes break down.",
+                "Add 2 cups of water, bring to a boil, then reduce heat to low.",
+                "Cover and simmer for 1-1.5 hours until mutton is tender.",
+                "If needed, cook uncovered for a few minutes to thicken the gravy.",
+                "Stir in garam masala and garnish with fresh cilantro before serving."
+            ],
+            nutrition: {
+                calories: 450,
+                protein: 35,
+                carbs: 10,
+                fat: 25
+            },
+            prepTime: 15,
+            cookTime: 90,
+            servings: 6
+        },
+        {
+            id: 4,
+            name: "Mutton Kebabs",
+            description: "Juicy, spiced ground mutton kebabs, grilled to perfection. Great as an appetizer or in wraps.",
+            image: "🍢",
+            category: "mutton",
+            ingredients: [
+                { name: "ground mutton", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+                { name: "green chilies", amount: 3, unit: "", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "mint leaves", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "cumin powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "coriander powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "red chili powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "egg", amount: 1, unit: "", category: "Dairy" },
+                { name: "breadcrumbs", amount: 0.25, unit: "cup", category: "Dry Goods" },
+                { name: "lemon", amount: 1, unit: "", category: "Produce" },
+                { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" }
+            ],
+            instructions: [
+                "Finely chop onion, green chilies, mint leaves, and cilantro.",
+                "In a large bowl, combine ground mutton with all ingredients except oil.",
+                "Mix well and let it rest for 30 minutes in the refrigerator.",
+                "Divide the mixture and shape into sausage-shaped kebabs around skewers.",
+                "Brush with oil and grill over medium heat for 10-12 minutes, turning occasionally.",
+                "Alternatively, bake in a 400°F (200°C) oven for 15-20 minutes.",
+                "Squeeze fresh lemon juice over kebabs before serving.",
+                "Serve hot with mint chutney and sliced onions."
+            ],
+            nutrition: {
+                calories: 320,
+                protein: 28,
+                carbs: 5,
+                fat: 22
+            },
+            prepTime: 20,
+            cookTime: 15,
+            servings: 6
+        },
+        {
+            id: 5,
+            name: "Mutton Stew",
+            description: "Hearty mutton stew with vegetables and herbs, slow-cooked to perfection.",
+            image: "🍲",
+            category: "mutton",
+            ingredients: [
+                { name: "mutton", amount: 2, unit: "lbs", category: "Meat" },
+                { name: "potatoes", amount: 3, unit: "medium", category: "Produce" },
+                { name: "carrots", amount: 2, unit: "large", category: "Produce" },
+                { name: "onions", amount: 2, unit: "medium", category: "Produce" },
+                { name: "celery stalks", amount: 2, unit: "", category: "Produce" },
+                { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                { name: "tomato paste", amount: 2, unit: "tbsp", category: "Canned Goods" },
+                { name: "beef broth", amount: 4, unit: "cups", category: "Canned Goods" },
+                { name: "red wine", amount: 1, unit: "cup", category: "Alcoholic Beverages" },
+                { name: "bay leaves", amount: 2, unit: "", category: "Spices" },
+                { name: "rosemary", amount: 2, unit: "sprigs", category: "Produce" },
+                { name: "thyme", amount: 2, unit: "sprigs", category: "Produce" },
+                { name: "all-purpose flour", amount: 3, unit: "tbsp", category: "Dry Goods" },
+                { name: "olive oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "black pepper", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "fresh parsley", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "Cut mutton into 1-inch cubes and season with salt and pepper.",
+                "Heat olive oil in a large pot and brown mutton in batches. Set aside.",
+                "In the same pot, sauté chopped onions, carrots, and celery until softened.",
+                "Add minced garlic and cook for 1 minute until fragrant.",
+                "Stir in tomato paste and flour, cook for 2 minutes.",
+                "Slowly add red wine, scraping up browned bits from the bottom of the pot.",
+                "Add beef broth, bay leaves, rosemary, and thyme.",
+                "Return mutton to the pot, bring to a boil, then reduce heat to low.",
+                "Cover and simmer for 1.5 hours.",
+                "Add diced potatoes and cook for another 30 minutes until meat and potatoes are tender.",
+                "Remove bay leaves and herb stems.",
+                "Season to taste and garnish with chopped parsley before serving."
+            ],
+            nutrition: {
+                calories: 480,
+                protein: 35,
+                carbs: 25,
+                fat: 22
+            },
+            prepTime: 25,
+            cookTime: 120,
+            servings: 6
+        },
+        
+        // Vegetarian Recipes
+        {
+            id: 1,
+            name: "Vegetable Biryani",
+            description: "Aromatic rice dish with mixed vegetables, fragrant spices, and caramelized onions.",
+            image: "🍚",
+            category: "vegetarian",
+            ingredients: [
+                { name: "basmati rice", amount: 2, unit: "cups", category: "Dry Goods" },
+                { name: "mixed vegetables", amount: 3, unit: "cups", category: "Produce" },
+                { name: "onions", amount: 2, unit: "large", category: "Produce" },
+                { name: "tomatoes", amount: 2, unit: "medium", category: "Produce" },
+                { name: "green chilies", amount: 3, unit: "", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "yogurt", amount: 0.5, unit: "cup", category: "Dairy" },
+                { name: "biryani masala", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "turmeric powder", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "red chili powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "saffron strands", amount: 1, unit: "pinch", category: "Spices" },
+                { name: "milk", amount: 0.25, unit: "cup", category: "Dairy" },
+                { name: "ghee", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "mint leaves", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "cashews", amount: 0.25, unit: "cup", category: "Nuts & Seeds" },
+                { name: "raisins", amount: 0.25, unit: "cup", category: "Dry Goods" }
+            ],
+            instructions: [
+                "Wash and soak rice for 30 minutes, then drain.",
+                "Heat 1 tbsp ghee in a pot and fry cashews and raisins until golden. Set aside.",
+                "In the same pot, add remaining ghee and fry sliced onions until golden brown. Remove half and set aside.",
+                "Add ginger-garlic paste and green chilies, sauté for 1 minute.",
+                "Add mixed vegetables (carrots, peas, beans, cauliflower, potatoes) and cook for 5 minutes.",
+                "Add chopped tomatoes, all spices, and salt. Cook for 5 minutes.",
+                "Add yogurt and cook for another 2 minutes.",
+                "In a separate pot, parboil rice with whole spices until 70% cooked. Drain.",
+                "Soak saffron in warm milk.",
+                "Layer half the rice over the vegetables, sprinkle with biryani masala, fried onions, mint, and cilantro.",
+                "Add remaining rice, then top with remaining fried onions, herbs, fried nuts, raisins, and saffron milk.",
+                "Cover tightly with foil and lid, cook on low heat for 20 minutes.",
+                "Let rest for 10 minutes before serving."
+            ],
+            nutrition: {
+                calories: 380,
+                protein: 8,
+                carbs: 60,
+                fat: 12
+            },
+            prepTime: 30,
+            cookTime: 60,
+            servings: 6
+        },
+        {
+            id: 2,
+            name: "Vegetable Curry",
+            description: "Hearty mixed vegetable curry in a rich, spiced tomato gravy.",
+            image: "🍛",
+            category: "vegetarian",
+            ingredients: [
+                { name: "mixed vegetables", amount: 4, unit: "cups", category: "Produce" },
+                { name: "onions", amount: 2, unit: "medium", category: "Produce" },
+                { name: "tomatoes", amount: 3, unit: "medium", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "green chilies", amount: 2, unit: "", category: "Produce" },
+                { name: "curry powder", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "turmeric powder", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "coconut milk", amount: 1, unit: "cup", category: "Canned Goods" },
+                { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "Heat oil in a large pot and sauté finely chopped onions until golden brown.",
+                "Add ginger-garlic paste and sliced green chilies, cook for 2 minutes.",
+                "Add turmeric and curry powder, cook for 1 minute.",
+                "Add chopped tomatoes and cook until they break down and oil separates, about 5 minutes.",
+                "Add mixed vegetables (carrots, peas, beans, cauliflower, potatoes) and salt.",
+                "Add 1 cup water, bring to a boil, then reduce heat to low.",
+                "Cover and simmer for 15-20 minutes until vegetables are tender.",
+                "Stir in coconut milk and simmer for another 5 minutes.",
+                "Add garam masala and garnish with fresh cilantro before serving."
+            ],
+            nutrition: {
+                calories: 220,
+                protein: 5,
+                carbs: 25,
+                fat: 12
+            },
+            prepTime: 15,
+            cookTime: 30,
+            servings: 4
+        },
+        {
+            id: 3,
+            name: "Vegetarian Lasagna",
+            description: "Layers of pasta, rich tomato sauce, vegetables, and creamy cheese. A family favorite.",
+            image: "🍝",
+            category: "vegetarian",
+            ingredients: [
+                { name: "lasagna noodles", amount: 12, unit: "", category: "Dry Goods" },
+                { name: "zucchini", amount: 2, unit: "medium", category: "Produce" },
+                { name: "bell peppers", amount: 2, unit: "", category: "Produce" },
+                { name: "spinach", amount: 6, unit: "oz", category: "Produce" },
+                { name: "mushrooms", amount: 8, unit: "oz", category: "Produce" },
+                { name: "onion", amount: 1, unit: "large", category: "Produce" },
+                { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+                { name: "crushed tomatoes", amount: 28, unit: "oz", category: "Canned Goods" },
+                { name: "tomato paste", amount: 2, unit: "tbsp", category: "Canned Goods" },
+                { name: "ricotta cheese", amount: 15, unit: "oz", category: "Dairy" },
+                { name: "mozzarella cheese", amount: 2, unit: "cups", category: "Dairy" },
+                { name: "parmesan cheese", amount: 1, unit: "cup", category: "Dairy" },
+                { name: "egg", amount: 1, unit: "", category: "Dairy" },
+                { name: "Italian seasoning", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+                { name: "fresh basil", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "Preheat oven to 375°F (190°C).",
+                "Cook lasagna noodles according to package directions. Drain and set aside.",
+                "Heat olive oil in a large pan and sauté chopped onions and garlic until soft.",
+                "Add diced bell peppers, zucchini, and mushrooms. Cook for 5-7 minutes until softened.",
+                "Add spinach and cook until wilted.",
+                "Stir in crushed tomatoes, tomato paste, half the Italian seasoning, salt, and pepper.",
+                "Simmer for 10 minutes until slightly thickened.",
+                "In a bowl, mix ricotta cheese, half the parmesan, egg, remaining Italian seasoning, salt, and pepper.",
+                "In a 9x13 baking dish, spread a thin layer of tomato sauce.",
+                "Layer lasagna noodles, ricotta mixture, vegetables, sauce, and mozzarella. Repeat layers.",
+                "Top with remaining mozzarella and parmesan cheese.",
+                "Cover with foil and bake for 25 minutes. Remove foil and bake for another 15 minutes until bubbly and golden.",
+                "Let rest for 10 minutes before serving.",
+                "Garnish with fresh basil leaves."
+            ],
+            nutrition: {
+                calories: 380,
+                protein: 22,
+                carbs: 35,
+                fat: 18
+            },
+            prepTime: 30,
+            cookTime: 50,
+            servings: 8
+        },
+        {
+            id: 4,
+            name: "Vegetarian Pad Thai",
+            description: "Classic Thai noodle dish with tofu, vegetables, and a tangy-sweet sauce.",
+            image: "🥢",
+            category: "vegetarian",
+            ingredients: [
+                { name: "rice noodles", amount: 8, unit: "oz", category: "Dry Goods" },
+                { name: "firm tofu", amount: 14, unit: "oz", category: "Refrigerated" },
+                { name: "bean sprouts", amount: 2, unit: "cups", category: "Produce" },
+                { name: "carrots", amount: 2, unit: "medium", category: "Produce" },
+                { name: "green onions", amount: 4, unit: "", category: "Produce" },
+                { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+                { name: "eggs", amount: 2, unit: "", category: "Dairy" },
+                { name: "peanuts", amount: 0.5, unit: "cup", category: "Nuts & Seeds" },
+                { name: "cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+                { name: "lime", amount: 1, unit: "", category: "Produce" },
+                { name: "brown sugar", amount: 3, unit: "tbsp", category: "Baking" },
+                { name: "soy sauce", amount: 3, unit: "tbsp", category: "Condiments" },
+                { name: "rice vinegar", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "tamarind paste", amount: 2, unit: "tbsp", category: "Condiments" },
+                { name: "sriracha sauce", amount: 1, unit: "tbsp", category: "Condiments" },
+                { name: "vegetable oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" }
+            ],
+            instructions: [
+                "Soak rice noodles in hot water according to package directions until al dente. Drain and set aside.",
+                "Press tofu to remove excess water, then cut into small cubes.",
+                "In a small bowl, whisk together brown sugar, soy sauce, rice vinegar, tamarind paste, and sriracha.",
+                "Heat 2 tbsp oil in a large wok or skillet over high heat.",
+                "Add tofu and cook until golden brown on all sides, about 5 minutes. Remove and set aside.",
+                "Add remaining oil to the wok. Add minced garlic and cook for 30 seconds.",
+                "Push everything to one side of the wok, crack eggs into the empty space, and scramble until cooked.",
+                "Add julienned carrots and half the green onions, stir-fry for 2 minutes.",
+                "Add drained noodles and sauce. Toss everything together and cook for 2-3 minutes.",
+                "Add bean sprouts and tofu, toss for another minute until heated through.",
+                "Remove from heat and squeeze lime juice over the noodles.",
+                "Serve topped with chopped peanuts, remaining green onions, and cilantro."
+            ],
+            nutrition: {
+                calories: 380,
+                protein: 15,
+                carbs: 50,
+                fat: 14
+            },
+            prepTime: 20,
+            cookTime: 15,
+            servings: 4
+        },
+        {
+            id: 5,
+            name: "Vegetarian Mutton Curry",
+            description: "Plant-based alternative to traditional mutton curry using jackfruit and mushrooms.",
+            image: "🍛",
+            category: "vegetarian",
+            ingredients: [
+                { name: "young jackfruit", amount: 20, unit: "oz", category: "Canned Goods" },
+                { name: "portobello mushrooms", amount: 8, unit: "oz", category: "Produce" },
+                { name: "onions", amount: 2, unit: "large", category: "Produce" },
+                { name: "tomatoes", amount: 3, unit: "medium", category: "Produce" },
+                { name: "ginger paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "garlic paste", amount: 1, unit: "tbsp", category: "Produce" },
+                { name: "green chilies", amount: 3, unit: "", category: "Produce" },
+                { name: "curry powder", amount: 2, unit: "tbsp", category: "Spices" },
+                { name: "turmeric powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "coriander powder", amount: 1, unit: "tbsp", category: "Spices" },
+                { name: "cumin powder", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+                { name: "coconut milk", amount: 1, unit: "cup", category: "Canned Goods" },
+                { name: "vegetable oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+                { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+                "Drain and rinse jackfruit. Cut into smaller pieces, removing any tough parts.",
+                "Clean and slice mushrooms into thick pieces.",
+                "Heat oil in a large pot and sauté finely chopped onions until golden brown.",
+                "Add ginger-garlic paste and sliced green chilies, cook for 2 minutes.",
+                "Add turmeric, coriander, cumin, and curry powder. Cook for 1 minute.",
+                "Add chopped tomatoes and cook until they break down and oil separates, about 5 minutes.",
+                "Add jackfruit and mushrooms, stir to coat with the spices.",
+                "Add 1.5 cups of water, bring to a boil, then reduce heat to low.",
+                "Cover and simmer for 30-40 minutes until jackfruit is tender and has absorbed the flavors.",
+                "Stir in coconut milk and simmer for another 5 minutes.",
+                "Add garam masala and garnish with fresh cilantro before serving.",
+                "Serve with rice or naan bread."
+            ],
+            nutrition: {
+                calories: 250,
+                protein: 6,
+                carbs: 30,
+                fat: 14
+            },
+            prepTime: 20,
+            cookTime: 50,
+            servings: 6
+        },
+        {
+            id: 6,
+            name: "Spinach and Mushroom Quiche",
+            description: "Savory pie with a flaky crust filled with spinach, mushrooms, and cheese.",
+            image: "🥧",
+            category: "vegetarian",
+            ingredients: [
+            { name: "pie crust", amount: 1, unit: "", category: "Bread & Bakery" },
+            { name: "eggs", amount: 5, unit: "large", category: "Dairy" },
+            { name: "heavy cream", amount: 1, unit: "cup", category: "Dairy" },
+            { name: "spinach", amount: 6, unit: "oz", category: "Produce" },
+            { name: "mushrooms", amount: 8, unit: "oz", category: "Produce" },
+            { name: "onion", amount: 1, unit: "small", category: "Produce" },
+            { name: "garlic cloves", amount: 2, unit: "", category: "Produce" },
+            { name: "gruyere cheese", amount: 1.5, unit: "cups", category: "Dairy" },
+            { name: "nutmeg", amount: 0.25, unit: "tsp", category: "Spices" },
+            { name: "olive oil", amount: 1, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" }
+            ],
+            instructions: [
+            "Preheat oven to 375°F (190°C).",
+            "Place pie crust in a 9-inch pie dish and prick the bottom with a fork.",
+            "Bake crust for 10 minutes. Remove and set aside.",
+            "Heat olive oil in a skillet over medium heat.",
+            "Add chopped onion and cook until translucent, about 3 minutes.",
+            "Add minced garlic and sliced mushrooms, cook until mushrooms release their moisture.",
+            "Add spinach and cook until wilted. Remove from heat and let cool slightly.",
+            "In a bowl, whisk together eggs, heavy cream, nutmeg, salt, and pepper.",
+            "Spread vegetable mixture in the pie crust and sprinkle with grated cheese.",
+            "Pour egg mixture over the vegetables and cheese.",
+            "Bake for 35-40 minutes until set and golden brown.",
+            "Let cool for 10 minutes before slicing and serving."
+            ],
+            nutrition: {
+            calories: 380,
+            protein: 15,
+            carbs: 20,
+            fat: 28
+            },
+            prepTime: 20,
+            cookTime: 50,
+            servings: 8
+            },
+            {
+            id: 7,
+            name: "Eggplant Parmesan",
+            description: "Italian classic with layers of breaded eggplant, marinara sauce, and cheese.",
+            image: "🍆",
+            category: "vegetarian",
+            ingredients: [
+            { name: "eggplants", amount: 2, unit: "large", category: "Produce" },
+            { name: "eggs", amount: 2, unit: "large", category: "Dairy" },
+            { name: "breadcrumbs", amount: 2, unit: "cups", category: "Dry Goods" },
+            { name: "parmesan cheese", amount: 1, unit: "cup", category: "Dairy" },
+            { name: "mozzarella cheese", amount: 2, unit: "cups", category: "Dairy" },
+            { name: "marinara sauce", amount: 3, unit: "cups", category: "Canned Goods" },
+            { name: "garlic powder", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "dried oregano", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "dried basil", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "olive oil", amount: 0.5, unit: "cup", category: "Oils & Vinegars" },
+            { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+            { name: "fresh basil", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+            "Preheat oven to 375°F (190°C).",
+            "Slice eggplants into 1/4-inch rounds and sprinkle with salt. Let sit for 30 minutes, then pat dry.",
+            "In a shallow dish, beat eggs. In another dish, mix breadcrumbs, 1/2 cup parmesan, garlic powder, oregano, and basil.",
+            "Dip eggplant slices in egg, then coat with breadcrumb mixture.",
+            "Heat olive oil in a large skillet and fry eggplant until golden brown on both sides. Drain on paper towels.",
+            "Spread 1/2 cup marinara sauce in the bottom of a 9x13 baking dish.",
+            "Layer half the eggplant slices, 1 cup marinara, and 1/2 cup mozzarella.",
+            "Repeat layers, ending with remaining mozzarella and parmesan on top.",
+            "Bake for 30-35 minutes until cheese is bubbly and golden.",
+            "Let rest for 10 minutes, then garnish with fresh basil before serving."
+            ],
+            nutrition: {
+            calories: 320,
+            protein: 15,
+            carbs: 25,
+            fat: 18
+            },
+            prepTime: 45,
+            cookTime: 35,
+            servings: 8
+            },
+            {
+            id: 8,
+            name: "Chickpea Curry",
+            description: "Hearty and flavorful curry with chickpeas, tomatoes, and aromatic spices.",
+            image: "🍛",
+            category: "vegetarian",
+            ingredients: [
+            { name: "chickpeas", amount: 2, unit: "cans (15 oz each)", category: "Canned Goods" },
+            { name: "onion", amount: 1, unit: "large", category: "Produce" },
+            { name: "tomatoes", amount: 3, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+            { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+            { name: "coconut milk", amount: 1, unit: "can (14 oz)", category: "Canned Goods" },
+            { name: "curry powder", amount: 2, unit: "tbsp", category: "Spices" },
+            { name: "turmeric", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "cumin", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "coriander", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+            { name: "lime", amount: 1, unit: "", category: "Produce" }
+            ],
+            instructions: [
+            "Heat oil in a large pot over medium heat.",
+            "Add diced onion and cook until soft and translucent, about 5 minutes.",
+            "Add minced garlic and ginger, cook for 1 minute until fragrant.",
+            "Add curry powder, turmeric, cumin, and coriander. Cook for 30 seconds.",
+            "Add diced tomatoes and cook until they break down, about 5 minutes.",
+            "Drain and rinse chickpeas, then add to the pot.",
+            "Pour in coconut milk and 1/2 cup water. Stir well.",
+            "Bring to a simmer and cook for 15-20 minutes, stirring occasionally.",
+            "Add garam masala and cook for another 5 minutes.",
+            "Squeeze in lime juice and garnish with chopped cilantro.",
+            "Serve with rice or naan bread."
+            ],
+            nutrition: {
+            calories: 320,
+            protein: 12,
+            carbs: 35,
+            fat: 16
+            },
+            prepTime: 10,
+            cookTime: 30,
+            servings: 4
+            },
+            {
+            id: 9,
+            name: "Mushroom Risotto",
+            description: "Creamy Italian rice dish with mushrooms, white wine, and parmesan cheese.",
+            image: "🍚",
+            category: "vegetarian",
+            ingredients: [
+            { name: "arborio rice", amount: 1.5, unit: "cups", category: "Dry Goods" },
+            { name: "mushrooms", amount: 1, unit: "lb", category: "Produce" },
+            { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+            { name: "vegetable broth", amount: 6, unit: "cups", category: "Canned Goods" },
+            { name: "white wine", amount: 0.5, unit: "cup", category: "Alcoholic Beverages" },
+            { name: "parmesan cheese", amount: 1, unit: "cup", category: "Dairy" },
+            { name: "butter", amount: 3, unit: "tbsp", category: "Dairy" },
+            { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "thyme", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "salt", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "black pepper", amount: 0.5, unit: "tsp", category: "Spices" },
+            { name: "fresh parsley", amount: 2, unit: "tbsp", category: "Produce" }
+            ],
+            instructions: [
+            "In a saucepan, warm vegetable broth over low heat.",
+            "Heat olive oil and 1 tbsp butter in a large pot over medium heat.",
+            "Add diced onion and cook until translucent, about 3 minutes.",
+            "Add minced garlic and cook for 30 seconds.",
+            "Add sliced mushrooms and thyme, cook until mushrooms are soft, about 5 minutes.",
+            "Add arborio rice and stir for 2 minutes until translucent around the edges.",
+            "Pour in white wine and stir until absorbed.",
+            "Add 1 cup of warm broth, stirring frequently until absorbed.",
+            "Continue adding broth, 1/2 cup at a time, stirring until each addition is absorbed.",
+            "Cook until rice is creamy and al dente, about 20-25 minutes total.",
+            "Remove from heat and stir in remaining butter and parmesan cheese.",
+            "Season with salt and pepper, garnish with chopped parsley before serving."
+            ],
+            nutrition: {
+            calories: 380,
+            protein: 10,
+            carbs: 45,
+            fat: 16
+            },
+            prepTime: 10,
+            cookTime: 35,
+            servings: 4
+            },
+            {
+            id: 10,
+            name: "Stuffed Bell Peppers",
+            description: "Bell peppers filled with a flavorful mixture of rice, beans, and cheese.",
+            image: "🫑",
+            category: "vegetarian",
+            ingredients: [
+            { name: "bell peppers", amount: 6, unit: "large", category: "Produce" },
+            { name: "rice", amount: 1, unit: "cup", category: "Dry Goods" },
+            { name: "black beans", amount: 1, unit: "can (15 oz)", category: "Canned Goods" },
+            { name: "corn", amount: 1, unit: "cup", category: "Produce" },
+            { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+            { name: "diced tomatoes", amount: 1, unit: "can (14 oz)", category: "Canned Goods" },
+            { name: "cheddar cheese", amount: 1.5, unit: "cups", category: "Dairy" },
+            { name: "cumin", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "chili powder", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "paprika", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "olive oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+            { name: "lime", amount: 1, unit: "", category: "Produce" }
+            ],
+            instructions: [
+            "Preheat oven to 375°F (190°C).",
+            "Cook rice according to package directions.",
+            "Cut tops off bell peppers and remove seeds and membranes.",
+            "Place peppers in a baking dish and microwave for 5 minutes to soften slightly.",
+            "Heat olive oil in a large skillet over medium heat.",
+            "Add diced onion and cook until soft, about 3 minutes.",
+            "Add minced garlic, cumin, chili powder, and paprika. Cook for 1 minute.",
+            "Add drained black beans, corn, and diced tomatoes. Cook for 5 minutes.",
+            "Stir in cooked rice, 1 cup of cheese, and juice of half a lime.",
+            "Fill peppers with the rice mixture and top with remaining cheese.",
+            "Cover with foil and bake for 25 minutes.",
+            "Remove foil and bake for another 10 minutes until cheese is bubbly.",
+            "Garnish with chopped cilantro before serving."
+            ],
+            nutrition: {
+            calories: 320,
+            protein: 12,
+            carbs: 45,
+            fat: 10
+            },
+            prepTime: 20,
+            cookTime: 40,
+            servings: 6
+            },
+            {
+            id: 11,
+            name: "Palak Paneer",
+            description: "Indian cottage cheese cubes in a creamy spinach sauce with aromatic spices.",
+            image: "🧀",
+            category: "vegetarian",
+            ingredients: [
+            { name: "paneer", amount: 14, unit: "oz", category: "Dairy" },
+            { name: "spinach", amount: 1, unit: "lb", category: "Produce" },
+            { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+            { name: "tomato", amount: 1, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+            { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+            { name: "green chilies", amount: 2, unit: "", category: "Produce" },
+            { name: "cumin seeds", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "turmeric", amount: 0.5, unit: "tsp", category: "Spices" },
+            { name: "heavy cream", amount: 0.25, unit: "cup", category: "Dairy" },
+            { name: "ghee", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "salt", amount: 1, unit: "tsp", category: "Spices" }
+            ],
+            instructions: [
+            "Blanch spinach in boiling water for 2-3 minutes, then transfer to ice water.",
+            "Drain spinach and blend into a smooth puree. Set aside.",
+            "Cut paneer into 1-inch cubes.",
+            "Heat 1 tbsp ghee in a pan and lightly fry paneer until golden. Remove and set aside.",
+            "In the same pan, heat remaining ghee and add cumin seeds. Let them splutter.",
+            "Add chopped onion and cook until golden brown.",
+            "Add minced garlic, ginger, and green chilies. Cook for 1 minute.",
+            "Add chopped tomato and cook until soft and mushy.",
+            "Add turmeric and salt, cook for another minute.",
+            "Add spinach puree and cook for 5 minutes.",
+            "Add fried paneer cubes and garam masala. Simmer for 5 minutes.",
+            "Stir in heavy cream and cook for 2 more minutes.",
+            "Serve hot with rice or naan bread."
+            ],
+            nutrition: {
+            calories: 320,
+            protein: 18,
+            carbs: 12,
+            fat: 22
+            },
+            prepTime: 15,
+            cookTime: 30,
+            servings: 4
+            },
+            {
+            id: 12,
+            name: "Chana Masala",
+            description: "Spicy and tangy chickpea curry, a popular North Indian vegetarian dish.",
+            image: "🍛",
+            category: "vegetarian",
+            ingredients: [
+            { name: "chickpeas", amount: 2, unit: "cans (15 oz each)", category: "Canned Goods" },
+            { name: "onion", amount: 1, unit: "large", category: "Produce" },
+            { name: "tomatoes", amount: 3, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 4, unit: "", category: "Produce" },
+            { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+            { name: "green chilies", amount: 2, unit: "", category: "Produce" },
+            { name: "cumin seeds", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "coriander powder", amount: 2, unit: "tsp", category: "Spices" },
+            { name: "turmeric", amount: 0.5, unit: "tsp", category: "Spices" },
+            { name: "red chili powder", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "amchur (dried mango powder)", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "vegetable oil", amount: 2, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+            { name: "lemon", amount: 1, unit: "", category: "Produce" }
+            ],
+            instructions: [
+            "Heat oil in a large pot over medium heat.",
+            "Add cumin seeds and let them splutter.",
+            "Add finely chopped onion and cook until golden brown, about 5-7 minutes.",
+            "Add minced garlic, ginger, and green chilies. Cook for 1 minute.",
+            "Add chopped tomatoes and cook until they break down and oil separates, about 5-7 minutes.",
+            "Add coriander powder, turmeric, red chili powder, and salt. Cook for 2 minutes.",
+            "Drain and rinse chickpeas, then add to the pot.",
+            "Add 1 cup water and bring to a boil.",
+            "Reduce heat and simmer for 15-20 minutes, mashing some chickpeas against the side of the pot.",
+            "Add garam masala and amchur powder. Cook for another 5 minutes.",
+            "Squeeze in lemon juice and garnish with chopped cilantro.",
+            "Serve with rice or naan bread."
+            ],
+            nutrition: {
+            calories: 280,
+            protein: 12,
+            carbs: 40,
+            fat: 8
+            },
+            prepTime: 10,
+            cookTime: 35,
+            servings: 4
+            },
+            {
+            id: 13,
+            name: "Vegetable Samosas",
+            description: "Crispy pastry triangles filled with spiced potatoes and peas.",
+            image: "🥟",
+            category: "vegetarian",
+            ingredients: [
+            { name: "all-purpose flour", amount: 2, unit: "cups", category: "Dry Goods" },
+            { name: "potatoes", amount: 3, unit: "medium", category: "Produce" },
+            { name: "green peas", amount: 1, unit: "cup", category: "Produce" },
+            { name: "onion", amount: 1, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 2, unit: "", category: "Produce" },
+            { name: "ginger", amount: 1, unit: "tsp", category: "Produce" },
+            { name: "green chilies", amount: 2, unit: "", category: "Produce" },
+            { name: "cumin seeds", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "coriander powder", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "garam masala", amount: 0.5, unit: "tsp", category: "Spices" },
+            { name: "turmeric", amount: 0.25, unit: "tsp", category: "Spices" },
+            { name: "amchur (dried mango powder)", amount: 0.5, unit: "tsp", category: "Spices" },
+            { name: "vegetable oil", amount: 0.25, unit: "cup", category: "Oils & Vinegars" },
+            { name: "ghee", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" },
+            { name: "salt", amount: 1, unit: "tsp", category: "Spices" }
+            ],
+            instructions: [
+            "For the dough, mix flour, 3 tbsp oil, salt, and enough water to form a firm dough. Cover and rest for 30 minutes.",
+            "Boil potatoes until tender, then peel and mash coarsely.",
+            "Heat ghee in a pan and add cumin seeds. Let them splutter.",
+            "Add finely chopped onion and cook until translucent.",
+            "Add minced garlic, ginger, and green chilies. Cook for 1 minute.",
+            "Add peas, turmeric, coriander powder, garam masala, amchur, and salt. Cook for 2 minutes.",
+            "Add mashed potatoes and mix well. Cook for 5 minutes, then add chopped cilantro.",
+            "Remove from heat and let the filling cool completely.",
+            "Divide dough into 12 equal portions and roll each into a circle.",
+            "Cut each circle in half, wet the straight edge with water, and form a cone.",
+            "Fill the cone with potato mixture and seal the open edge.",
+            "Heat oil for deep frying and fry samosas until golden brown and crispy.",
+            "Serve hot with mint chutney or tamarind sauce."
+            ],
+            nutrition: {
+            calories: 220,
+            protein: 4,
+            carbs: 30,
+            fat: 10
+            },
+            prepTime: 45,
+            cookTime: 30,
+            servings: 12
+            },
+            {
+            id: 14,
+            name: "Aloo Gobi",
+            description: "Classic Indian dish of potatoes and cauliflower cooked with aromatic spices.",
+            image: "🥔",
+            category: "vegetarian",
+            ingredients: [
+            { name: "cauliflower", amount: 1, unit: "medium head", category: "Produce" },
+            { name: "potatoes", amount: 3, unit: "medium", category: "Produce" },
+            { name: "onion", amount: 1, unit: "large", category: "Produce" },
+            { name: "tomatoes", amount: 2, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 3, unit: "", category: "Produce" },
+            { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+            { name: "green chilies", amount: 2, unit: "", category: "Produce" },
+            { name: "cumin seeds", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "turmeric", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "coriander powder", amount: 2, unit: "tsp", category: "Spices" },
+            { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "red chili powder", amount: 0.5, unit: "tsp", category: "Spices" },
+            { name: "vegetable oil", amount: 3, unit: "tbsp", category: "Oils & Vinegars" },
+            { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+            "Cut cauliflower into florets and potatoes into 1-inch cubes.",
+            "Heat oil in a large pan over medium heat.",
+            "Add cumin seeds and let them splutter.",
+            "Add finely chopped onion and cook until golden brown.",
+            "Add minced garlic, ginger, and green chilies. Cook for 1 minute.",
+            "Add chopped tomatoes and cook until they break down, about 5 minutes.",
+            "Add turmeric, coriander powder, red chili powder, and salt. Cook for 2 minutes.",
+            "Add potatoes, mix well, and cook covered for 5 minutes.",
+            "Add cauliflower, mix gently, and cook covered for 15-20 minutes until vegetables are tender.",
+            "Stir occasionally and add a splash of water if needed to prevent sticking.",
+            "Add garam masala and mix well.",
+            "Garnish with chopped cilantro before serving."
+            ],
+            nutrition: {
+            calories: 180,
+            protein: 5,
+            carbs: 30,
+            fat: 6
+            },
+            prepTime: 15,
+            cookTime: 30,
+            servings: 4
+            },
+            {
+            id: 15,
+            name: "Dal Makhani",
+            description: "Creamy black lentils and kidney beans slow-cooked with butter and spices.",
+            image: "🥣",
+            category: "vegetarian",
+            ingredients: [
+            { name: "black lentils (urad dal)", amount: 1, unit: "cup", category: "Dry Goods" },
+            { name: "kidney beans", amount: 0.25, unit: "cup", category: "Dry Goods" },
+            { name: "onion", amount: 1, unit: "large", category: "Produce" },
+            { name: "tomatoes", amount: 3, unit: "medium", category: "Produce" },
+            { name: "garlic cloves", amount: 6, unit: "", category: "Produce" },
+            { name: "ginger", amount: 1, unit: "tbsp", category: "Produce" },
+            { name: "green chilies", amount: 2, unit: "", category: "Produce" },
+            { name: "butter", amount: 4, unit: "tbsp", category: "Dairy" },
+            { name: "heavy cream", amount: 0.25, unit: "cup", category: "Dairy" },
+            { name: "cumin seeds", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "red chili powder", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "garam masala", amount: 1, unit: "tsp", category: "Spices" },
+            { name: "dried fenugreek leaves (kasuri methi)", amount: 1, unit: "tbsp", category: "Spices" },
+            { name: "fresh cilantro", amount: 0.25, unit: "cup", category: "Produce" }
+            ],
+            instructions: [
+            "Soak black lentils and kidney beans overnight, then drain.",
+            "In a pressure cooker or pot, add lentils, beans, and 4 cups water. Cook until soft (about 30 minutes in a pressure cooker or 2 hours in a pot).",
+            "Heat 2 tbsp butter in a large pot and add cumin seeds. Let them splutter.",
+            "Add finely chopped onion and cook until golden brown.",
+            "Add minced garlic, ginger, and green chilies. Cook for 1 minute.",
+            "Add chopped tomatoes and cook until they break down and oil separates, about 10 minutes.",
+            "Add red chili powder and salt. Cook for 2 minutes.",
+            "Add cooked lentils and beans with their liquid. Simmer for 30 minutes, stirring occasionally.",
+            "Mash some lentils against the side of the pot to thicken the dal.",
+            "Add remaining butter, cream, garam masala, and crushed fenugreek leaves.",
+            "Simmer for another 10 minutes until creamy.",
+            "Garnish with chopped cilantro before serving."
+            ],
+            nutrition: {
+            calories: 280,
+            protein: 14,
+            carbs: 35,
+            fat: 12
+            },
+            prepTime: 15,
+            cookTime: 180,
+            servings: 6
+            }
     ];
 
     // DOM elements
     const recipesContainer = document.getElementById('recipes-container');
-    const recipeSearch = document.getElementById('recipe-search');
-    const allTab = document.getElementById('all-tab');
-    const selectedTab = document.getElementById('selected-tab');
     const selectedRecipesContainer = document.getElementById('selected-recipes');
     const generateListBtn = document.getElementById('generate-list');
     const shoppingListContainer = document.getElementById('shopping-list-container');
     const shoppingList = document.getElementById('shopping-list');
     const clearListBtn = document.getElementById('clear-list');
     const printListBtn = document.getElementById('print-list');
+    const recipeSearch = document.getElementById('recipe-search');
+    const allTab = document.getElementById('all-tab');
+    const selectedTab = document.getElementById('selected-tab');
+    const portionBtns = document.querySelectorAll('.portion-btn');
+    const categoryBtns = document.querySelectorAll('.category-btn');
     const recipeModal = document.getElementById('recipe-modal');
     const closeModal = document.getElementById('close-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalImage = document.getElementById('modal-image');
-    const modalIngredients = document.getElementById('modal-ingredients');
-    const modalInstructions = document.getElementById('modal-instructions');
-    const modalNutrition = document.getElementById('modal-nutrition');
     const modalAddRecipe = document.getElementById('modal-add-recipe');
-    const modalPortion = document.getElementById('modal-portion');
     const decreasePortion = document.getElementById('decrease-portion');
     const increasePortion = document.getElementById('increase-portion');
-    const portionBtns = document.querySelectorAll('.portion-btn');
-
-    // App state
+    
+    // State
     let selectedRecipes = [];
-    let currentRecipe = null;
     let defaultPortionSize = 2;
     let currentView = 'all'; // 'all' or 'selected'
-
-    // Initialize the app
-    function init() {
+    let currentCategory = 'all'; // 'all', 'chicken', 'mutton', or 'vegetarian'
+    let currentRecipe = null;
+    let currentModalPortion = 2;
+    
+    // Initialize
+    renderRecipes();
+    
+    // Event listeners
+    recipeSearch.addEventListener('input', renderRecipes);
+    
+    allTab.addEventListener('click', () => {
+        currentView = 'all';
+        allTab.classList.add('tab-active');
+        selectedTab.classList.remove('tab-active');
         renderRecipes();
-        setupEventListeners();
-    }
-
-    // Render recipe cards
+    });
+    
+    selectedTab.addEventListener('click', () => {
+        currentView = 'selected';
+        selectedTab.classList.add('tab-active');
+        allTab.classList.remove('tab-active');
+        renderRecipes();
+    });
+    
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            categoryBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = btn.dataset.category;
+            renderRecipes();
+        });
+    });
+    
+    portionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            portionBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            defaultPortionSize = parseInt(btn.dataset.portion);
+            updateSelectedRecipes();
+        });
+    });
+    
+    generateListBtn.addEventListener('click', generateShoppingList);
+    clearListBtn.addEventListener('click', clearShoppingList);
+    printListBtn.addEventListener('click', printShoppingList);
+    
+    closeModal.addEventListener('click', () => {
+        recipeModal.classList.add('hidden');
+    });
+    
+    modalAddRecipe.addEventListener('click', () => {
+        addRecipeToSelected(currentRecipe, currentModalPortion);
+        recipeModal.classList.add('hidden');
+    });
+    
+    decreasePortion.addEventListener('click', () => {
+        if (currentModalPortion > 1) {
+            currentModalPortion--;
+            document.getElementById('modal-portion').textContent = currentModalPortion;
+            updateModalIngredients();
+        }
+    });
+    
+    increasePortion.addEventListener('click', () => {
+        currentModalPortion++;
+        document.getElementById('modal-portion').textContent = currentModalPortion;
+        updateModalIngredients();
+    });
+    
+    // Functions
     function renderRecipes() {
         recipesContainer.innerHTML = '';
         
-        const recipesToRender = currentView === 'all' 
-            ? recipes 
-            : recipes.filter(recipe => selectedRecipes.some(r => r.id === recipe.id));
-        
         const searchTerm = recipeSearch.value.toLowerCase();
+        let filteredRecipes = recipes;
         
-        const filteredRecipes = recipesToRender.filter(recipe => 
-            recipe.name.toLowerCase().includes(searchTerm) || 
-            recipe.description.toLowerCase().includes(searchTerm)
-        );
-        
-        if (filteredRecipes.length === 0) {
-            recipesContainer.innerHTML = `
-                <div class="col-span-2 text-center py-8 text-gray-500">
-                    No recipes found matching "${searchTerm}"
-                </div>
-            `;
-            return;
+        // Filter by search term
+        if (searchTerm) {
+            filteredRecipes = filteredRecipes.filter(recipe => 
+                recipe.name.toLowerCase().includes(searchTerm) || 
+                recipe.description.toLowerCase().includes(searchTerm)
+            );
         }
         
+        // Filter by category
+        if (currentCategory !== 'all') {
+            filteredRecipes = filteredRecipes.filter(recipe => recipe.category === currentCategory);
+        }
+        
+        // Filter by view (all or selected)
+        if (currentView === 'selected') {
+            const selectedIds = selectedRecipes.map(r => r.id);
+            filteredRecipes = filteredRecipes.filter(recipe => selectedIds.includes(recipe.id));
+        }
+        
+        // Render recipe cards
         filteredRecipes.forEach(recipe => {
             const isSelected = selectedRecipes.some(r => r.id === recipe.id);
             
             const card = document.createElement('div');
-            card.className = `recipe-card bg-white border ${isSelected ? 'border-orange-500' : 'border-gray-200'} rounded-lg overflow-hidden shadow-sm hover:shadow-md`;
+            card.className = `recipe-card bg-white rounded-lg shadow-md overflow-hidden ${isSelected ? 'border-2 border-orange-500' : ''}`;
+            
+            let badgeClass = '';
+            if (recipe.category === 'chicken') badgeClass = 'badge-chicken';
+            if (recipe.category === 'mutton') badgeClass = 'badge-mutton';
+            if (recipe.category === 'vegetarian') badgeClass = 'badge-vegetarian';
+            
             card.innerHTML = `
-                <div class="p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-lg font-semibold text-gray-800">${recipe.name}</h3>
-                        <div class="text-4xl">${recipe.image}</div>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">${recipe.description}</p>
-                    <div class="flex justify-between items-center text-sm text-gray-500">
-                        <span>Prep: ${recipe.prepTime} min</span>
-                        <span>Cook: ${recipe.cookTime} min</span>
-                        <span>${recipe.servings} servings</span>
-                    </div>
-                    <div class="mt-4 flex justify-between items-center">
-                        <button class="view-recipe text-orange-600 hover:text-orange-700 text-sm font-medium" data-id="${recipe.id}">
-                            View Recipe
-                        </button>
-                        <button class="toggle-recipe ${isSelected ? 'text-orange-600 hover:text-orange-700' : 'text-gray-600 hover:text-gray-700'} text-sm font-medium" data-id="${recipe.id}">
-                            ${isSelected ? 'Remove' : 'Add to List'}
-                        </button>
+                <div class="relative p-4">
+                    <div class="recipe-badge ${badgeClass}">${recipe.category}</div>
+                    <div class="text-4xl mb-2">${recipe.image}</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">${recipe.name}</h3>
+                    <p class="text-sm text-gray-600 mb-3">${recipe.description}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500">
+                            <span class="font-medium">${recipe.prepTime + recipe.cookTime}</span> mins
+                            • <span class="font-medium">${recipe.servings}</span> servings
+                        </span>
+                        <button class="view-recipe-btn text-sm text-orange-600 hover:text-orange-700 font-medium">View Recipe</button>
                     </div>
                 </div>
             `;
             
             recipesContainer.appendChild(card);
-        });
-    }
-
-    // Setup event listeners
-    function setupEventListeners() {
-        // Search functionality
-        recipeSearch.addEventListener('input', renderRecipes);
-        
-        // Tab switching
-        allTab.addEventListener('click', () => {
-            allTab.classList.add('tab-active');
-            selectedTab.classList.remove('tab-active');
-            currentView = 'all';
-            renderRecipes();
-        });
-        
-        selectedTab.addEventListener('click', () => {
-            selectedTab.classList.add('tab-active');
-            allTab.classList.remove('tab-active');
-            currentView = 'selected';
-            renderRecipes();
-        });
-        
-        // Recipe card buttons
-        recipesContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('view-recipe')) {
-                const recipeId = parseInt(e.target.dataset.id);
-                openRecipeModal(recipeId);
-            }
             
-            if (e.target.classList.contains('toggle-recipe')) {
-                const recipeId = parseInt(e.target.dataset.id);
-                toggleRecipeSelection(recipeId);
-            }
-        });
-        
-        // Modal events
-        closeModal.addEventListener('click', () => {
-            recipeModal.classList.add('hidden');
-        });
-        
-        modalAddRecipe.addEventListener('click', () => {
-            if (currentRecipe) {
-                const portion = parseInt(modalPortion.textContent);
-                addRecipeToSelection(currentRecipe.id, portion);
-                recipeModal.classList.add('hidden');
-            }
-        });
-        
-        decreasePortion.addEventListener('click', () => {
-            let portion = parseInt(modalPortion.textContent);
-            if (portion > 1) {
-                portion--;
-                modalPortion.textContent = portion;
-                updateModalIngredients(portion);
-            }
-        });
-        
-        increasePortion.addEventListener('click', () => {
-            let portion = parseInt(modalPortion.textContent);
-            portion++;
-            modalPortion.textContent = portion;
-            updateModalIngredients(portion);
-        });
-        
-        // Default portion size buttons
-        portionBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                portionBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                defaultPortionSize = parseInt(btn.dataset.portion);
+            // Add event listener to view recipe button
+            card.querySelector('.view-recipe-btn').addEventListener('click', () => {
+                openRecipeModal(recipe);
             });
         });
         
-        // Generate shopping list
-        generateListBtn.addEventListener('click', generateShoppingList);
-        
-        // Clear shopping list
-        clearListBtn.addEventListener('click', () => {
-            selectedRecipes = [];
-            updateSelectedRecipesDisplay();
-            shoppingListContainer.classList.add('hidden');
-            generateListBtn.disabled = true;
-        });
-        
-        // Print shopping list
-        printListBtn.addEventListener('click', () => {
-            const printContent = document.createElement('div');
-            printContent.innerHTML = `
-                <h1 style="font-size: 24px; margin-bottom: 16px;">Shopping List</h1>
-                <h2 style="font-size: 18px; margin-bottom: 8px;">Recipes:</h2>
-                <ul style="margin-bottom: 16px;">
-                    ${selectedRecipes.map(recipe => `
-                        <li>${recipe.name} (${recipe.portionSize} servings)</li>
-                    `).join('')}
-                </ul>
-                ${shoppingList.innerHTML}
+        // Show message if no recipes found
+        if (filteredRecipes.length === 0) {
+            recipesContainer.innerHTML = `
+                <div class="col-span-2 text-center py-8 text-gray-500">
+                    No recipes found. Try adjusting your search or filters.
+                </div>
             `;
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Shopping List</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; padding: 20px; }
-                            h3 { margin-top: 16px; margin-bottom: 8px; }
-                            .shopping-list-item { margin-bottom: 4px; }
-                        </style>
-                    </head>
-                    <body>
-                        ${printContent.innerHTML}
-                    </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
-        });
-        
-        // Close modal when clicking outside
-        recipeModal.addEventListener('click', (e) => {
-            if (e.target === recipeModal) {
-                recipeModal.classList.add('hidden');
-            }
-        });
+        }
     }
-
-    // Open recipe modal
-    function openRecipeModal(recipeId) {
-        const recipe = recipes.find(r => r.id === recipeId);
-        if (!recipe) return;
-        
+    
+    function openRecipeModal(recipe) {
         currentRecipe = recipe;
+        currentModalPortion = defaultPortionSize;
         
-        modalTitle.textContent = recipe.name;
-        modalImage.innerHTML = `<div class="text-8xl flex items-center justify-center h-full">${recipe.image}</div>`;
+        document.getElementById('modal-title').textContent = recipe.name;
         
-        // Set default portion size
-        const selectedRecipe = selectedRecipes.find(r => r.id === recipeId);
-        const portionSize = selectedRecipe ? selectedRecipe.portionSize : defaultPortionSize;
-        modalPortion.textContent = portionSize;
+        const modalImage = document.getElementById('modal-image');
+        modalImage.innerHTML = `<div class="text-8xl">${recipe.image}</div>`;
         
-        // Update ingredients with portion size
-        updateModalIngredients(portionSize);
+        let categoryClass = '';
+        if (recipe.category === 'chicken') categoryClass = 'bg-amber-100 text-amber-800';
+        if (recipe.category === 'mutton') categoryClass = 'bg-red-100 text-red-800';
+        if (recipe.category === 'vegetarian') categoryClass = 'bg-green-100 text-green-800';
         
-        // Instructions
-        modalInstructions.innerHTML = '';
+        document.getElementById('modal-category').className = `mb-2 inline-block px-3 py-1 rounded-full text-sm font-medium ${categoryClass}`;
+        document.getElementById('modal-category').textContent = recipe.category.charAt(0).toUpperCase() + recipe.category.slice(1);
+        
+        document.getElementById('modal-portion').textContent = currentModalPortion;
+        
+        updateModalIngredients();
+        
+        const instructionsList = document.getElementById('modal-instructions');
+        instructionsList.innerHTML = '';
         recipe.instructions.forEach(instruction => {
             const li = document.createElement('li');
             li.textContent = instruction;
-            modalInstructions.appendChild(li);
+            instructionsList.appendChild(li);
         });
         
-        // Nutrition
-        modalNutrition.innerHTML = `
+        const nutritionDiv = document.getElementById('modal-nutrition');
+        nutritionDiv.innerHTML = `
             <div>Calories: ${recipe.nutrition.calories}</div>
             <div>Protein: ${recipe.nutrition.protein}g</div>
             <div>Carbs: ${recipe.nutrition.carbs}g</div>
             <div>Fat: ${recipe.nutrition.fat}g</div>
         `;
         
-        // Update button text
-        const isSelected = selectedRecipes.some(r => r.id === recipeId);
-        modalAddRecipe.textContent = isSelected ? 'Update in Shopping List' : 'Add to Shopping List';
+        // Check if recipe is already selected
+        const isSelected = selectedRecipes.some(r => r.id === recipe.id);
+        if (isSelected) {
+            modalAddRecipe.textContent = 'Update in Shopping List';
+        } else {
+            modalAddRecipe.textContent = 'Add to Shopping List';
+        }
         
         recipeModal.classList.remove('hidden');
     }
-
-    // Update modal ingredients based on portion size
-    function updateModalIngredients(portionSize) {
-        if (!currentRecipe) return;
+    
+    function updateModalIngredients() {
+        const ingredientsList = document.getElementById('modal-ingredients');
+        ingredientsList.innerHTML = '';
         
-        modalIngredients.innerHTML = '';
-        const ratio = portionSize / currentRecipe.servings;
+        const ratio = currentModalPortion / currentRecipe.servings;
         
         currentRecipe.ingredients.forEach(ingredient => {
-            const adjustedAmount = (ingredient.amount * ratio).toFixed(2).replace(/\.00$/, '');
             const li = document.createElement('li');
+            const adjustedAmount = (ingredient.amount * ratio).toFixed(2).replace(/\.00$/, '');
             li.textContent = `${adjustedAmount} ${ingredient.unit} ${ingredient.name}`;
-            modalIngredients.appendChild(li);
+            ingredientsList.appendChild(li);
         });
     }
-
-    // Toggle recipe selection
-    function toggleRecipeSelection(recipeId) {
-        const existingIndex = selectedRecipes.findIndex(r => r.id === recipeId);
+    
+    function addRecipeToSelected(recipe, portionSize) {
+        // Remove if already exists
+        selectedRecipes = selectedRecipes.filter(r => r.id !== recipe.id);
         
-        if (existingIndex >= 0) {
-            selectedRecipes.splice(existingIndex, 1);
-        } else {
-            const recipe = recipes.find(r => r.id === recipeId);
-            if (recipe) {
-                selectedRecipes.push({
-                    id: recipe.id,
-                    name: recipe.name,
-                    portionSize: defaultPortionSize,
-                    ingredients: recipe.ingredients
-                });
-            }
-        }
+        // Add with new portion size
+        selectedRecipes.push({
+            ...recipe,
+            portionSize: portionSize
+        });
         
-        updateSelectedRecipesDisplay();
+        updateSelectedRecipes();
         renderRecipes();
     }
-
-    // Add recipe to selection with specific portion size
-    function addRecipeToSelection(recipeId, portionSize) {
-        const existingIndex = selectedRecipes.findIndex(r => r.id === recipeId);
-        const recipe = recipes.find(r => r.id === recipeId);
-        
-        if (!recipe) return;
-        
-        if (existingIndex >= 0) {
-            selectedRecipes[existingIndex].portionSize = portionSize;
-        } else {
-            selectedRecipes.push({
-                id: recipe.id,
-                name: recipe.name,
-                portionSize: portionSize,
-                ingredients: recipe.ingredients
-            });
-        }
-        
-        updateSelectedRecipesDisplay();
-        renderRecipes();
-    }
-
-    // Update selected recipes display
-    function updateSelectedRecipesDisplay() {
+    
+    function updateSelectedRecipes() {
         if (selectedRecipes.length === 0) {
-            selectedRecipesContainer.innerHTML = `<div class="text-gray-500 italic">No recipes selected yet</div>`;
+            selectedRecipesContainer.innerHTML = '<div class="text-gray-500 italic">No recipes selected yet</div>';
             generateListBtn.disabled = true;
         } else {
             selectedRecipesContainer.innerHTML = '';
+            
             selectedRecipes.forEach(recipe => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center py-2 border-b border-gray-100';
-                div.innerHTML = `
-                    <span class="text-gray-800">${recipe.name}</span>
-                    <div class="flex items-center">
-                        <span class="text-sm text-gray-600 mr-2">${recipe.portionSize} servings</span>
-                        <button class="remove-recipe text-gray-400 hover:text-red-500" data-id="${recipe.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                const recipeItem = document.createElement('div');
+                recipeItem.className = 'flex justify-between items-center mb-2 bg-orange-50 rounded-lg p-2';
+                recipeItem.innerHTML = `
+                    <div>
+                        <span class="font-medium">${recipe.name}</span>
+                        <span class="text-sm text-gray-600">(${recipe.portionSize} servings)</span>
                     </div>
+                    <button class="remove-recipe-btn text-gray-400 hover:text-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 `;
                 
-                div.querySelector('.remove-recipe').addEventListener('click', () => {
-                    toggleRecipeSelection(recipe.id);
-                });
+                selectedRecipesContainer.appendChild(recipeItem);
                 
-                selectedRecipesContainer.appendChild(div);
+                // Add event listener to remove button
+                recipeItem.querySelector('.remove-recipe-btn').addEventListener('click', () => {
+                    selectedRecipes = selectedRecipes.filter(r => r.id !== recipe.id);
+                    updateSelectedRecipes();
+                    renderRecipes();
+                });
             });
+            
             generateListBtn.disabled = false;
         }
     }
-
-    // Generate shopping list
+    
     function generateShoppingList() {
         if (selectedRecipes.length === 0) return;
         
         // Combine ingredients from all selected recipes
         const combinedIngredients = {};
         
-        selectedRecipes.forEach(selectedRecipe => {
-            const recipe = recipes.find(r => r.id === selectedRecipe.id);
-            if (!recipe) return;
-            
-            const ratio = selectedRecipe.portionSize / recipe.servings;
+        selectedRecipes.forEach(recipe => {
+            const ratio = recipe.portionSize / recipe.servings;
             
             recipe.ingredients.forEach(ingredient => {
                 const key = `${ingredient.name}|${ingredient.unit}|${ingredient.category}`;
@@ -1540,40 +2662,138 @@
             if (!groupedIngredients[ingredient.category]) {
                 groupedIngredients[ingredient.category] = [];
             }
+            
             groupedIngredients[ingredient.category].push(ingredient);
         });
+        
+        // Sort categories
+        const sortedCategories = Object.keys(groupedIngredients).sort();
         
         // Render shopping list
         shoppingList.innerHTML = '';
         
-        Object.keys(groupedIngredients).sort().forEach(category => {
+        sortedCategories.forEach(category => {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'mb-4';
             categoryDiv.innerHTML = `
-                <h3 class="font-medium text-gray-700 mb-2">${category}</h3>
-                <div class="space-y-1">
-                    ${groupedIngredients[category].map(ingredient => {
-                        const formattedAmount = ingredient.amount.toFixed(2).replace(/\.00$/, '');
-                        return `
-                            <div class="shopping-list-item flex items-center">
-                                <input type="checkbox" class="mr-2 h-4 w-4 text-orange-600 rounded">
-                                <span class="text-gray-800">
-                                    ${formattedAmount} ${ingredient.unit} ${ingredient.name}
-                                </span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
+                <h4 class="font-medium text-gray-800 mb-2">${category}</h4>
+                <ul class="space-y-1"></ul>
             `;
+            
+            const categoryList = categoryDiv.querySelector('ul');
+            
+            // Sort ingredients by name
+            const sortedIngredients = groupedIngredients[category].sort((a, b) => a.name.localeCompare(b.name));
+            
+            sortedIngredients.forEach(ingredient => {
+                const li = document.createElement('li');
+                li.className = 'shopping-list-item flex items-center';
+                
+                const formattedAmount = ingredient.amount.toFixed(2).replace(/\.00$/, '');
+                const unitText = ingredient.unit ? `${ingredient.unit} ` : '';
+                
+                li.innerHTML = `
+                    <input type="checkbox" class="mr-2 h-4 w-4 text-orange-600 rounded">
+                    <span>${formattedAmount} ${unitText}${ingredient.name}</span>
+                `;
+                
+                categoryList.appendChild(li);
+            });
             
             shoppingList.appendChild(categoryDiv);
         });
         
         shoppingListContainer.classList.remove('hidden');
     }
-
-    // Initialize the app
-    init();
+    
+    function clearShoppingList() {
+        selectedRecipes = [];
+        updateSelectedRecipes();
+        renderRecipes();
+        shoppingListContainer.classList.add('hidden');
+    }
+    
+    function printShoppingList() {
+        const printWindow = window.open('', '_blank');
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Shopping List</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }
+                    h1 {
+                        text-align: center;
+                        color: #ea580c;
+                        margin-bottom: 20px;
+                    }
+                    h2 {
+                        margin-top: 20px;
+                        margin-bottom: 10px;
+                        color: #333;
+                    }
+                    .recipe {
+                        margin-bottom: 5px;
+                    }
+                    .category {
+                        margin-top: 15px;
+                        margin-bottom: 5px;
+                        font-weight: bold;
+                    }
+                    .ingredient {
+                        margin-bottom: 5px;
+                        padding-left: 20px;
+                    }
+                    .checkbox {
+                        display: inline-block;
+                        width: 15px;
+                        height: 15px;
+                        border: 1px solid #333;
+                        margin-right: 10px;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Shopping List</h1>
+                <h2>Recipes:</h2>
+        `);
+        
+        selectedRecipes.forEach(recipe => {
+            printWindow.document.write(`
+                <div class="recipe">
+                    ${recipe.name} (${recipe.portionSize} servings)
+                </div>
+            `);
+        });
+        
+        printWindow.document.write('<h2>Ingredients:</h2>');
+        
+        Array.from(shoppingList.children).forEach(categoryDiv => {
+            const categoryName = categoryDiv.querySelector('h4').textContent;
+            printWindow.document.write(`<div class="category">${categoryName}</div>`);
+            
+            const ingredients = categoryDiv.querySelectorAll('li');
+            ingredients.forEach(ingredient => {
+                printWindow.document.write(`
+                    <div class="ingredient">
+                        <span class="checkbox"></span>
+                        ${ingredient.textContent.trim()}
+                    </div>
+                `);
+            });
+        });
+        
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    }
 </script>
 </body>
 </html>
